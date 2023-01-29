@@ -4,7 +4,6 @@ using System.Reflection;
 using Verse;
 
 namespace Universum.Utilities {
-
     /**
      * Stops pollution from being added to vacuum terrain.
      */
@@ -15,5 +14,5 @@ namespace Universum.Utilities {
             return true;
         }
     }
-
 }
+
