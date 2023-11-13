@@ -6,12 +6,20 @@ using Verse;
 
 namespace Universum.World.Patch {
     public class WorldCameraDriver {
+        public static Vector3 cameraOrigin = new Vector3(0, 0, 0);
+        public static CelestialObject target = null;
+
         public static void Init(Harmony harmony) {
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_AltitudePercent)).Patch();
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_MinAltitude)).Patch();
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_CurrentZoom)).Patch();
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_WorldCameraDriverOnGUI)).Patch();
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_Update)).Patch();
+        }
+
+        public static Vector3 GetTargetPosition() {
+            if (target != null) return target.transformedPosition;
+            return cameraOrigin;
         }
 
         [HarmonyPatch]
@@ -172,8 +180,7 @@ namespace Universum.World.Patch {
                 if (Find.World == null) {
                     __instance.MyCamera.gameObject.SetActive(false);
                 } else {
-                    if (!Find.WorldInterface.everReset)
-                        Find.WorldInterface.Reset();
+                    if (!Find.WorldInterface.everReset) Find.WorldInterface.Reset();
                     Vector2 curInputDollyVect = __instance.CalculateCurInputDollyVect();
                     if (curInputDollyVect != Vector2.zero) {
                         float num = (float) (((double) __instance.altitude - (double) RimWorld.Planet.WorldCameraDriver.MinAltitude) / (CameraInfo.maxAltitude - (double) RimWorld.Planet.WorldCameraDriver.MinAltitude) * 0.850000023841858 + 0.150000005960464);
@@ -219,11 +226,23 @@ namespace Universum.World.Patch {
                         __instance.RotateSoNorthIsUp(false);
                         __instance.ClampXRotation(ref __instance.sphereRotation);
                     }
-                    for (int index = 0; index < num1; ++index)
-                        __instance.config.ConfigFixedUpdate_60(ref __instance.rotationVelocity);
-                    __instance.ApplyPositionToGameObject();
+                    for (int index = 0; index < num1; ++index) __instance.config.ConfigFixedUpdate_60(ref __instance.rotationVelocity);
+                    ApplyPositionToGameObject(ref __instance);
                 }
                 return false;
+            }
+
+            public static void ApplyPositionToGameObject(ref RimWorld.Planet.WorldCameraDriver __instance) {
+                Quaternion invRot = ((!(__instance.rotationAnimation_lerpFactor < 1f)) ? __instance.sphereRotation : Quaternion.Lerp(__instance.rotationAnimation_prevSphereRotation, __instance.sphereRotation, __instance.rotationAnimation_lerpFactor));
+                if (Find.PlaySettings.lockNorthUp) {
+                    __instance.ClampXRotation(ref invRot);
+                }
+
+                __instance.MyCamera.transform.rotation = Quaternion.Inverse(invRot);
+                Vector3 vector = __instance.MyCamera.transform.rotation * Vector3.forward;
+                __instance.MyCamera.transform.position = -vector * __instance.altitude;
+
+                __instance.MyCamera.transform.position += GetTargetPosition();
             }
         }
     }

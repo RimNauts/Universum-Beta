@@ -232,9 +232,10 @@ namespace Universum.Game {
             _cameraDriver = Find.WorldCameraDriver;
 
             if (_camera != null) {
-                _camera.farClipPlane = 500.0f + CameraInfo.maxAltitude;
+                float farClipPlaneThreshold = 10000.0f;
+                _camera.farClipPlane = farClipPlaneThreshold + CameraInfo.maxAltitude;
                 _camera.fieldOfView = CameraInfo.fieldOfView;
-                RimWorld.Planet.WorldCameraManager.worldSkyboxCameraInt.farClipPlane = 500.0f + CameraInfo.maxAltitude;
+                RimWorld.Planet.WorldCameraManager.worldSkyboxCameraInt.farClipPlane = farClipPlaneThreshold + CameraInfo.maxAltitude;
             }
 
             for (int i = 0; i < _celestialObjects.Count; i++) {

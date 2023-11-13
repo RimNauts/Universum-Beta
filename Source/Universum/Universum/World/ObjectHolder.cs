@@ -41,6 +41,8 @@ namespace Universum.World {
             keepAfterAbandon = celestialObjectDef.objectHolder.keepAfterAbandon;
 
             _celestialObject.objectHolder = this;
+
+            Patch.WorldCameraDriver.target = _celestialObject;
         }
 
         public override void Destroy() {
