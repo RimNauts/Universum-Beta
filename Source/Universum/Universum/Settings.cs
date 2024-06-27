@@ -77,6 +77,7 @@ namespace Universum {
 
                 try {
                     Utilities.Cache.clear_utility_toggle();
+                    Utilities.CachingHandler.ResetSettingsEnabledCache();
                 } catch { }
             }
             if (Current.Game != null && Game.MainLoop.instance != null && buttons_view.ButtonText(TranslatorFormattedStringExtensions.Translate("Universum.Info.regenerate"))) {
@@ -128,6 +129,7 @@ namespace Universum {
                     Settings.utilities[utility.Key].toggle = checkOn;
                     try {
                         Utilities.Cache.clear_utility_toggle();
+                        Utilities.CachingHandler.ResetSettingsEnabledCache();
                     } catch { }
                 }
             }

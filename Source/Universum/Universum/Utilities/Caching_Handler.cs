@@ -206,14 +206,6 @@ namespace Universum.Utilities {
     }
 
     /**
-     * Makes sure all cache is cleared when switching between worlds.
-     */
-    [HarmonyLib.HarmonyPatch(typeof(Verse.Game), "ClearCaches")]
-    public static class Game_ClearCaches {
-        public static void Postfix() => Cache.clear();
-    }
-
-    /**
      * Remove map from cache when map is deleted.
      */
     [HarmonyLib.HarmonyPatch(typeof(MapDeiniter), "Deinit")]

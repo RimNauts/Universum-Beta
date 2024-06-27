@@ -39,6 +39,7 @@ namespace Universum {
                     prefix: Style.tab
                 );
             }
+            Utilities.CachingHandler.Init();
         }
 
         public class ModContent : Mod {

@@ -106,6 +106,7 @@
     <Compile Include="Functionality\PerlinNoise.cs" />
     <Compile Include="Functionality\Random.cs" />
     <Compile Include="Game\MainLoop.cs" />
+    <Compile Include="Game\Patch\Game.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Logger.cs" />
@@ -115,8 +116,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\Biome\Handler.cs" />
     <Compile Include="Utilities\Biome\Properties.cs" />
+    <Compile Include="Utilities\CachingHandler.cs" />
     <Compile Include="Utilities\Caching_Handler.cs" />
     <Compile Include="Utilities\Climate.cs" />
+    <Compile Include="Utilities\SubscriberManager.cs" />
     <Compile Include="Utilities\Vacuum.cs" />
     <Compile Include="Utilities\Ocean_Masking.cs" />
     <Compile Include="Utilities\Gene\Handler.cs" />
