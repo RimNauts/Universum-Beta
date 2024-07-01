@@ -313,12 +313,12 @@ namespace Universum.Game {
         }
 
         private void _SaveData() {
-            _exposeCelestialObjectDefNames.Clear();
-            _exposeCelestialObjectSeeds.Clear();
-            _exposeCelestialObjectIds.Clear();
-            _exposeCelestialObjectTargetIds.Clear();
-            _exposeCelestialObjectPositions.Clear();
-            _exposeCelestialObjectDeathTicks.Clear();
+            _exposeCelestialObjectDefNames = new List<string>();
+            _exposeCelestialObjectSeeds = new List<int?>();
+            _exposeCelestialObjectIds = new List<int?>();
+            _exposeCelestialObjectTargetIds = new List<int?>();
+            _exposeCelestialObjectPositions = new List<Vector3?>();
+            _exposeCelestialObjectDeathTicks = new List<int?>();
 
             for (int i = 0; i < _totalCelestialObjectsCached; i++) {
                 _celestialObjectsCache[i].GetExposeData(
@@ -338,12 +338,12 @@ namespace Universum.Game {
             Scribe_Collections.Look(ref _exposeCelestialObjectPositions, "_exposeCelestialObjectPositions", LookMode.Value);
             Scribe_Collections.Look(ref _exposeCelestialObjectDeathTicks, "_exposeCelestialObjectDeathTicks", LookMode.Value);
 
-            _exposeCelestialObjectDefNames.Clear();
-            _exposeCelestialObjectSeeds.Clear();
-            _exposeCelestialObjectIds.Clear();
-            _exposeCelestialObjectTargetIds.Clear();
-            _exposeCelestialObjectPositions.Clear();
-            _exposeCelestialObjectDeathTicks.Clear();
+            _exposeCelestialObjectDefNames = new List<string>();
+            _exposeCelestialObjectSeeds = new List<int?>();
+            _exposeCelestialObjectIds = new List<int?>();
+            _exposeCelestialObjectTargetIds = new List<int?>();
+            _exposeCelestialObjectPositions = new List<Vector3?>();
+            _exposeCelestialObjectDeathTicks = new List<int?>();
         }
 
         private void _LoadData() {
@@ -356,7 +356,8 @@ namespace Universum.Game {
         }
 
         private void _PostLoadData() {
-            World.Generator.nextId = _exposeCelestialObjectIds.Max() ?? 0;
+            World.Generator.nextId = 0;
+            if (!_exposeCelestialObjectIds.NullOrEmpty()) World.Generator.nextId = _exposeCelestialObjectIds.Max() ?? 0;
 
             World.Generator.Create(
                 _exposeCelestialObjectDefNames,
@@ -370,12 +371,12 @@ namespace Universum.Game {
             int numCelestialObjects = _celestialObjects.Count;
             for (int i = 0; i < numCelestialObjects; i++) _celestialObjects[i].FindTarget(_celestialObjects);
 
-            _exposeCelestialObjectDefNames.Clear();
-            _exposeCelestialObjectSeeds.Clear();
-            _exposeCelestialObjectIds.Clear();
-            _exposeCelestialObjectTargetIds.Clear();
-            _exposeCelestialObjectPositions.Clear();
-            _exposeCelestialObjectDeathTicks.Clear();
+            _exposeCelestialObjectDefNames = new List<string>();
+            _exposeCelestialObjectSeeds = new List<int?>();
+            _exposeCelestialObjectIds = new List<int?>();
+            _exposeCelestialObjectTargetIds = new List<int?>();
+            _exposeCelestialObjectPositions = new List<Vector3?>();
+            _exposeCelestialObjectDeathTicks = new List<int?>();
         }
     }
 }
