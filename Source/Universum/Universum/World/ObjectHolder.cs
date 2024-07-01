@@ -19,6 +19,8 @@ namespace Universum.World {
 
         private string _exposeCelestialObjectDefName;
         private int? _exposeCelestialObjectSeed;
+        private int? _exposeCelestialObjectId;
+        private int? _exposeCelestialObjectTargetId;
         private Vector3? _exposeCelestialObjectPosition;
         private int? _exposeCelestialObjectDeathTick;
 
@@ -30,11 +32,13 @@ namespace Universum.World {
         public void Init(
             string celestialObjectDefName,
             int? celestialObjectSeed = null,
+            int? celestialObjectId = null,
+            int? celestialObjectTargetId = null,
             Vector3? celestialObjectPosition = null,
             int? celestialObjectDeathTick = null,
             CelestialObject celestialObject = null
         ) {
-            this.celestialObject = celestialObject ?? Generator.Create(celestialObjectDefName, celestialObjectSeed, celestialObjectPosition, celestialObjectDeathTick);
+            this.celestialObject = celestialObject ?? Generator.Create(celestialObjectDefName, celestialObjectSeed, celestialObjectId, celestialObjectTargetId, celestialObjectPosition, celestialObjectDeathTick);
             celestialObjectDef = Defs.Loader.celestialObjects[celestialObjectDefName];
 
             _overlayIcon = Assets.GetTexture(celestialObjectDef.objectHolder.overlayIconPath);
@@ -243,11 +247,15 @@ namespace Universum.World {
         private void _SaveData() {
             _exposeCelestialObjectDefName = celestialObject.def.defName;
             _exposeCelestialObjectSeed = celestialObject.seed;
+            _exposeCelestialObjectId = celestialObject.id;
+            _exposeCelestialObjectTargetId = celestialObject.targetId;
             _exposeCelestialObjectPosition = celestialObject.position;
             _exposeCelestialObjectDeathTick = celestialObject.deathTick;
 
             Scribe_Values.Look(ref _exposeCelestialObjectDefName, "_exposeCelestialObjectDefName");
             Scribe_Values.Look(ref _exposeCelestialObjectSeed, "_exposeCelestialObjectSeed");
+            Scribe_Values.Look(ref _exposeCelestialObjectId, "_exposeCelestialObjectId");
+            Scribe_Values.Look(ref _exposeCelestialObjectTargetId, "_exposeCelestialObjectTargetId");
             Scribe_Values.Look(ref _exposeCelestialObjectPosition, "_exposeCelestialObjectPosition");
             Scribe_Values.Look(ref _exposeCelestialObjectDeathTick, "_exposeCelestialObjectDeathTick");
         }
@@ -255,12 +263,16 @@ namespace Universum.World {
         private void _LoadData() {
             Scribe_Values.Look(ref _exposeCelestialObjectDefName, "_exposeCelestialObjectDefName");
             Scribe_Values.Look(ref _exposeCelestialObjectSeed, "_exposeCelestialObjectSeed");
+            Scribe_Values.Look(ref _exposeCelestialObjectId, "_exposeCelestialObjectId");
+            Scribe_Values.Look(ref _exposeCelestialObjectTargetId, "_exposeCelestialObjectTargetId");
             Scribe_Values.Look(ref _exposeCelestialObjectPosition, "_exposeCelestialObjectPosition");
             Scribe_Values.Look(ref _exposeCelestialObjectDeathTick, "_exposeCelestialObjectDeathTick");
         }
 
         private void _PostLoadData() {
-            Init(_exposeCelestialObjectDefName, _exposeCelestialObjectSeed, _exposeCelestialObjectPosition, _exposeCelestialObjectDeathTick);
+            Init(_exposeCelestialObjectDefName, _exposeCelestialObjectSeed, _exposeCelestialObjectId, _exposeCelestialObjectTargetId, _exposeCelestialObjectPosition, _exposeCelestialObjectDeathTick);
+
+            Game.MainLoop.instance.dirtyCache = true;
         }
     }
 }

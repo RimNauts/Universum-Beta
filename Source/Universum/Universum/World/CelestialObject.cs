@@ -6,6 +6,7 @@ using Verse;
 namespace Universum.World {
     public abstract class CelestialObject {
         public int seed;
+        public int id = -1;
         public string name;
         public Defs.CelestialObject def;
 
@@ -35,6 +36,7 @@ namespace Universum.World {
         protected Quaternion _spinRotation = Quaternion.identity;
         protected Quaternion _inclinatioRotation = Quaternion.identity;
         protected CelestialObject _target;
+        public int targetId = -1;
 
         protected Transform[] _transforms = new Transform[0];
         protected ObjectComponent[] _components = new ObjectComponent[0];
@@ -83,10 +85,13 @@ namespace Universum.World {
             for (int i = 0; i < _components.Length; i++) _components[i].SetActive(active);
         }
 
-        public virtual void GetExposeData(List<string> defNames, List<int?> seeds, List<Vector3?> positions, List<int?> deathTicks) {
+        public virtual void GetExposeData(List<string> defNames, List<int?> seeds, List<int?> ids, List<int?> targetIds, List<Vector3?> positions, List<int?> deathTicks) {
             if (objectHolder != null) return;
+
             defNames.Add(def.defName);
             seeds.Add(seed);
+            ids.Add(id);
+            targetIds.Add(targetId);
             positions.Add(position);
             deathTicks.Add(deathTick);
         }
@@ -96,9 +101,13 @@ namespace Universum.World {
             for (int i = 0; i < _components.Length; i++) _components[i].UpdateInfo();
         }
 
-        public virtual void Init(int? seed = null, Vector3? position = null, int? deathTick = null) {
+        public virtual void Init(int? seed = null, int? id = null, int? targetId = null, Vector3? position = null, int? deathTick = null) {
             this.seed = seed ?? Rand.Int;
             _rand = new Functionality.Random(this.seed);
+
+            this.id = id ?? Generator.nextId++;
+
+            this.targetId = targetId ?? -1;
 
             this.deathTick = deathTick;
 
@@ -306,9 +315,31 @@ namespace Universum.World {
         public virtual void SetTarget(CelestialObject target) {
             _target = target;
 
+            if (_target != null) {
+                targetId = _target.id;
+            } else {
+                targetId = -1;
+            }
+
             UpdateScale();
             UpdateOrbitRadius();
             UpdateSpeed();
+        }
+
+        public virtual void FindTarget(List<CelestialObject> celestialObjects) {
+            bool notTargeting = targetId == -1;
+            if (notTargeting) return;
+
+            int numCelestialObjects = celestialObjects.Count;
+            bool foundTarget;
+            for (int i = 0; i < numCelestialObjects; i++) {
+                foundTarget = celestialObjects[i].id == targetId;
+                if (foundTarget) {
+                    SetTarget(celestialObjects[i]);
+
+                    return;
+                }
+            }
         }
 
         public virtual void UpdateOrbitRadius() {

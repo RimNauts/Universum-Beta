@@ -1,5 +1,5 @@
 ﻿using Gilzoide.ManagedJobs;
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,6 +46,8 @@ namespace Universum.Game {
 
         private List<string> _exposeCelestialObjectDefNames = new List<string>();
         private List<int?> _exposeCelestialObjectSeeds = new List<int?>();
+        private List<int?> _exposeCelestialObjectIds = new List<int?>();
+        private List<int?> _exposeCelestialObjectTargetIds = new List<int?>();
         private List<Vector3?> _exposeCelestialObjectPositions = new List<Vector3?>();
         private List<int?> _exposeCelestialObjectDeathTicks = new List<int?>();
 
@@ -244,6 +246,10 @@ namespace Universum.Game {
 
             for (int i = 0; i < _celestialObjects.Count; i++) {
                 if (_celestialObjects[i].ShouldDespawn()) {
+                    for (int j = 0; j < _celestialObjects.Count; j++) {
+                        if (_celestialObjects[j].targetId == _celestialObjects[i].id) _celestialObjects[j].SetTarget(target: null);
+                    }
+
                     _celestialObjects[i].Destroy();
                     _celestialObjects[i] = null;
                 }
@@ -276,6 +282,10 @@ namespace Universum.Game {
                 _visualGenerationWorker = new Thread(() => _ProcessVisualGenerationQueue(copiedQueue));
                 _visualGenerationWorker.Start();
             }
+
+            for (int i = 0; i < _totalCelestialObjectsCached; i++) _celestialObjects[i].FindTarget(_celestialObjects);
+        }
+
         public class CelestialUpdateJob : IJobParallelFor {
             public World.CelestialObject[] celestialObjects = Array.Empty<World.CelestialObject>();
 
@@ -305,6 +315,8 @@ namespace Universum.Game {
         private void _SaveData() {
             _exposeCelestialObjectDefNames.Clear();
             _exposeCelestialObjectSeeds.Clear();
+            _exposeCelestialObjectIds.Clear();
+            _exposeCelestialObjectTargetIds.Clear();
             _exposeCelestialObjectPositions.Clear();
             _exposeCelestialObjectDeathTicks.Clear();
 
@@ -312,6 +324,8 @@ namespace Universum.Game {
                 _celestialObjectsCache[i].GetExposeData(
                     _exposeCelestialObjectDefNames,
                     _exposeCelestialObjectSeeds,
+                    _exposeCelestialObjectIds,
+                    _exposeCelestialObjectTargetIds,
                     _exposeCelestialObjectPositions,
                     _exposeCelestialObjectDeathTicks
                 );
@@ -319,11 +333,15 @@ namespace Universum.Game {
 
             Scribe_Collections.Look(ref _exposeCelestialObjectDefNames, "_exposeCelestialObjectDefNames", LookMode.Value);
             Scribe_Collections.Look(ref _exposeCelestialObjectSeeds, "_exposeCelestialObjectSeeds", LookMode.Value);
+            Scribe_Collections.Look(ref _exposeCelestialObjectIds, "_exposeCelestialObjectIds", LookMode.Value);
+            Scribe_Collections.Look(ref _exposeCelestialObjectTargetIds, "_exposeCelestialObjectTargetIds", LookMode.Value);
             Scribe_Collections.Look(ref _exposeCelestialObjectPositions, "_exposeCelestialObjectPositions", LookMode.Value);
             Scribe_Collections.Look(ref _exposeCelestialObjectDeathTicks, "_exposeCelestialObjectDeathTicks", LookMode.Value);
 
             _exposeCelestialObjectDefNames.Clear();
             _exposeCelestialObjectSeeds.Clear();
+            _exposeCelestialObjectIds.Clear();
+            _exposeCelestialObjectTargetIds.Clear();
             _exposeCelestialObjectPositions.Clear();
             _exposeCelestialObjectDeathTicks.Clear();
         }
@@ -331,20 +349,31 @@ namespace Universum.Game {
         private void _LoadData() {
             Scribe_Collections.Look(ref _exposeCelestialObjectDefNames, "_exposeCelestialObjectDefNames", LookMode.Value);
             Scribe_Collections.Look(ref _exposeCelestialObjectSeeds, "_exposeCelestialObjectSeeds", LookMode.Value);
+            Scribe_Collections.Look(ref _exposeCelestialObjectIds, "_exposeCelestialObjectIds", LookMode.Value);
+            Scribe_Collections.Look(ref _exposeCelestialObjectTargetIds, "_exposeCelestialObjectTargetIds", LookMode.Value);
             Scribe_Collections.Look(ref _exposeCelestialObjectPositions, "_exposeCelestialObjectPositions", LookMode.Value);
             Scribe_Collections.Look(ref _exposeCelestialObjectDeathTicks, "_exposeCelestialObjectDeathTicks", LookMode.Value);
         }
 
         private void _PostLoadData() {
+            World.Generator.nextId = _exposeCelestialObjectIds.Max() ?? 0;
+
             World.Generator.Create(
                 _exposeCelestialObjectDefNames,
                 _exposeCelestialObjectSeeds,
+                _exposeCelestialObjectIds,
+                _exposeCelestialObjectTargetIds,
                 _exposeCelestialObjectPositions,
                 _exposeCelestialObjectDeathTicks
             );
 
+            int numCelestialObjects = _celestialObjects.Count;
+            for (int i = 0; i < numCelestialObjects; i++) _celestialObjects[i].FindTarget(_celestialObjects);
+
             _exposeCelestialObjectDefNames.Clear();
             _exposeCelestialObjectSeeds.Clear();
+            _exposeCelestialObjectIds.Clear();
+            _exposeCelestialObjectTargetIds.Clear();
             _exposeCelestialObjectPositions.Clear();
             _exposeCelestialObjectDeathTicks.Clear();
         }

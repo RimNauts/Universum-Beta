@@ -7,6 +7,7 @@ using Verse;
 namespace Universum.World {
     public class Generator : WorldGenStep {
         public override int SeedPart => 0;
+        public static int nextId = 0;
 
         public override void GenerateFresh(string seed) {
             Game.MainLoop.instance.FreshGame();
@@ -77,6 +78,8 @@ namespace Universum.World {
         public static List<CelestialObject> Create(
             List<string> celestialObjectDefNames,
             List<int?> seeds = null,
+            List<int?> ids = null,
+            List<int?> targetIds = null,
             List<Vector3?> positions = null,
             List<int?> deathTicks = null
         ) {
@@ -89,8 +92,14 @@ namespace Universum.World {
                 int? seed = null;
                 if (!seeds.NullOrEmpty()) seed = seeds[i];
                 
+                int? id = null;
+                if (!ids.NullOrEmpty()) id = ids[i];
+
+                int? targetId = null;
+                if (!targetIds.NullOrEmpty()) targetId = targetIds[i];
+
                 Vector3? position = null;
-                if (!seeds.NullOrEmpty()) position = positions[i];
+                if (!positions.NullOrEmpty()) position = positions[i];
 
                 int? deathTick = null;
                 if (!deathTicks.NullOrEmpty()) deathTick = deathTicks[i];
@@ -100,7 +109,7 @@ namespace Universum.World {
                     new object[] { celestialObjectDefName }
                 );
                 
-                celestialObject.Init(seed, position, deathTick);
+                celestialObject.Init(seed, id, targetId, position, deathTick);
                 celestialObjects.Add(celestialObject);
             }
             Game.MainLoop.instance.AddObject(celestialObjects);
@@ -108,13 +117,13 @@ namespace Universum.World {
             return celestialObjects;
         }
 
-        public static CelestialObject Create(string celestialObjectDefName, int? seed = null, Vector3? position = null, int? deathTick = null) {
+        public static CelestialObject Create(string celestialObjectDefName, int? seed = null, int? id = null, int? targetId = null, Vector3? position = null, int? deathTick = null) {
             CelestialObject celestialObject = (CelestialObject) Activator.CreateInstance(
                 Defs.Loader.celestialObjects[celestialObjectDefName].celestialObjectClass,
                 new object[] { celestialObjectDefName }
             );
 
-            celestialObject.Init(seed, position, deathTick);
+            celestialObject.Init(seed, id, targetId, position, deathTick);
 
             Game.MainLoop.instance.AddObject(celestialObject);
 
@@ -124,6 +133,8 @@ namespace Universum.World {
         public static ObjectHolder CreateObjectHolder(
             string celestialObjectDefName,
             int? celestialObjectSeed = null,
+            int? celestialObjectId = null,
+            int? celestialObjectTargetId = null,
             Vector3? celestialObjectPosition = null,
             int? celestialObjectDeathTick = null,
             CelestialObject celestialObject = null,
@@ -139,7 +150,7 @@ namespace Universum.World {
             objectHolder.creationGameTicks = Find.TickManager.TicksGame;
             objectHolder.Tile = tile;
 
-            objectHolder.Init(celestialObjectDefName, celestialObjectSeed, celestialObjectPosition, celestialObjectDeathTick, celestialObject);
+            objectHolder.Init(celestialObjectDefName, celestialObjectSeed, celestialObjectId, celestialObjectTargetId, celestialObjectPosition, celestialObjectDeathTick, celestialObject);
             objectHolder.PostMake();
             Find.WorldObjects.Add(objectHolder);
 

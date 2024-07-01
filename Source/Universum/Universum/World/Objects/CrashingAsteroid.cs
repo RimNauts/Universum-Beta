@@ -8,8 +8,8 @@ namespace Universum.World.Objects {
 
         public CrashingAsteroid(string celestialObjectDefName) : base(celestialObjectDefName) { }
 
-        public override void Init(int? seed = null, Vector3? position = null, int? deathTick = null) {
-            base.Init(seed, position, deathTick);
+        public override void Init(int? seed = null, int? id = null, int? targetId = null, Vector3? position = null, int? deathTick = null) {
+            base.Init(seed, id, targetId, position, deathTick);
 
             _baseOrbitRadius = _orbitRadius;
             double minOrbitRadius = 0.0;
