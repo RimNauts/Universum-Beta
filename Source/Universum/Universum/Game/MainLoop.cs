@@ -1,8 +1,9 @@
+﻿using Gilzoide.ManagedJobs;
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using Unity.Jobs;
 using UnityEngine;
 using Verse;
 
@@ -52,6 +53,8 @@ namespace Universum.Game {
 
         private Queue<World.CelestialObject> _visualGenerationQueue = new Queue<World.CelestialObject>();
         private Thread _visualGenerationWorker;
+
+        public static readonly CelestialUpdateJob celestialUpdateJob = new CelestialUpdateJob();
 
         public MainLoop(Verse.Game game) : base() {
             if (instance != null) {
@@ -208,7 +211,9 @@ namespace Universum.Game {
 
         private void _Update() {
             if (Utilities.Cache.allowed_utility("universum.main_loop_parallelization")) {
-                Parallel.For(0, _totalCelestialObjectsCached, new ParallelOptions { MaxDegreeOfParallelism = 4 }, i => { _celestialObjectsCache[i].Update(); });
+                celestialUpdateJob.celestialObjects = _celestialObjectsCache;
+                new ManagedJobParallelFor(celestialUpdateJob).Schedule(_totalCelestialObjectsCached, 400).Complete();
+
                 return;
             }
 
@@ -270,6 +275,12 @@ namespace Universum.Game {
 
                 _visualGenerationWorker = new Thread(() => _ProcessVisualGenerationQueue(copiedQueue));
                 _visualGenerationWorker.Start();
+            }
+        public class CelestialUpdateJob : IJobParallelFor {
+            public World.CelestialObject[] celestialObjects = Array.Empty<World.CelestialObject>();
+
+            public void Execute(int index) {
+                celestialObjects[index].Update();
             }
         }
 
