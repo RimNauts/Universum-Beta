@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using System.Reflection;
 using UnityEngine;
 using Verse.Steam;
@@ -12,6 +13,22 @@ namespace Universum.World.Patch {
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_CurrentZoom)).Patch();
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_WorldCameraDriverOnGUI)).Patch();
             _ = new PatchClassProcessor(harmony, typeof(WorldCameraDriver_Update)).Patch();
+        }
+
+        [HarmonyPatch]
+        static class WorldCameraDriver_JumpTo {
+            public static bool Prepare() => TargetMethod() != null;
+
+            public static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldCameraDriver:JumpTo", new Type[] { typeof(int) });
+
+            public static bool Prefix(ref RimWorld.Planet.WorldCameraDriver __instance, int tile) {
+                ObjectHolder objectHolder = ObjectHolderCache.Get(tile);
+
+                if (objectHolder == null) return true;
+
+                __instance.JumpTo(objectHolder.celestialObject.position);
+                return false;
+            }
         }
 
         [HarmonyPatch]
