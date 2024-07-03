@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+using Universum.World;
 using Verse;
 
 namespace Universum.Utilities {
@@ -12,7 +12,9 @@ namespace Universum.Utilities {
     public class GenCelestial_CelestialSunGlow {
         public static bool Prefix(ref float __result, int tile, int ticksAbs) {
             if (tile == -1) return false;
+
             if (!Cache.allowed_utility(Find.World.grid.tiles.ElementAt(tile).biome, "universum.remove_shadows")) return true;
+
             __result = 1.0f;
             return false;
         }
@@ -37,53 +39,66 @@ namespace Universum.Utilities {
     public static class MapDrawer_DrawMapMesh {
         public static void Prefix() {
             if (!Cache.allowed_utility("universum.vacuum_overlay")) return;
+
             Map map = Find.CurrentMap;
+
             if (Globals.rendered || !Cache.allowed_utility(map, "universum.vacuum")) return;
-            get_world_map_render();
-            if (!((List<RimWorld.Planet.WorldLayer>) typeof(RimWorld.Planet.WorldRenderer).GetField("layers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Find.World.renderer)).FirstOrFallback().ShouldRegenerate) {
-                Globals.rendered = true;
-            }
+
+            get_world_map_render(map);
+
+            if (!Find.World.renderer.layers.FirstOrFallback().ShouldRegenerate) Globals.rendered = true;
         }
 
-        public static void get_world_map_render() {
+        public static void get_world_map_render(Map map) {
+            Camera camera = Find.Camera;
+            Camera worldCamera = Find.WorldCamera;
+            Camera worldSkyboxCamera = RimWorld.Planet.WorldCameraManager.WorldSkyboxCamera;
+            RimWorld.Planet.WorldCameraDriver worldCameraDriver = Find.WorldCameraDriver;
+            RimWorld.Planet.World world = Find.World;
+
             // block celestial object rendering
             Game.MainLoop.instance.blockRendering = true;
             Game.MainLoop.instance.ForceRender();
 
-            RenderTexture oldTexture = Find.WorldCamera.targetTexture;
-            RenderTexture oldSkyboxTexture = RimWorld.Planet.WorldCameraManager.WorldSkyboxCamera.targetTexture;
+            RenderTexture oldTexture = worldCamera.targetTexture;
+            RenderTexture oldSkyboxTexture = worldSkyboxCamera.targetTexture;
 
-            Find.World.renderer.wantedMode = RimWorld.Planet.WorldRenderMode.Planet;
-            Find.WorldCameraDriver.JumpTo(Find.CurrentMap.Tile);
-            Find.WorldCameraDriver.altitude = Globals.planet_render_altitude;
-            Find.WorldCameraDriver.GetType()
-                .GetField("desiredAltitude", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(Find.WorldCameraDriver, Globals.planet_render_altitude);
+            world.renderer.wantedMode = RimWorld.Planet.WorldRenderMode.Planet;
+
+            ObjectHolder objectHolder = ObjectHolderCache.Get(map.Tile);
+            if (objectHolder != null) {
+                worldCameraDriver.JumpTo(objectHolder.celestialObject.transformedPosition);
+            } else {
+                worldCameraDriver.JumpTo(map.Tile);
+            }
+            worldCameraDriver.altitude = Globals.planet_render_altitude;
+            worldCameraDriver.desiredAltitude = Globals.planet_render_altitude;
+
+            worldCameraDriver.Update();
+            world.renderer.CheckActivateWorldCamera();
+            world.renderer.DrawWorldLayers();
+            RimWorld.Planet.WorldRendererUtility.UpdateWorldShadersParams();
 
             float aspect = (float) UI.screenWidth / UI.screenHeight;
 
-            Find.WorldCameraDriver.Update();
-            Find.World.renderer.CheckActivateWorldCamera();
-            Find.World.renderer.DrawWorldLayers();
-            RimWorld.Planet.WorldRendererUtility.UpdateWorldShadersParams();
+            worldSkyboxCamera.targetTexture = Globals.render;
+            worldSkyboxCamera.aspect = aspect;
+            worldSkyboxCamera.Render();
 
-            RimWorld.Planet.WorldCameraManager.WorldSkyboxCamera.targetTexture = Globals.render;
-            RimWorld.Planet.WorldCameraManager.WorldSkyboxCamera.aspect = aspect;
-            RimWorld.Planet.WorldCameraManager.WorldSkyboxCamera.Render();
-
-            Find.WorldCamera.targetTexture = Globals.render;
-            Find.WorldCamera.aspect = aspect;
-            Find.WorldCamera.Render();
+            worldCamera.targetTexture = Globals.render;
+            worldCamera.aspect = aspect;
+            worldCamera.Render();
 
             RenderTexture.active = Globals.render;
             Globals.planet_screenshot.ReadPixels(new Rect(0, 0, 2048, 2048), 0, 0);
             Globals.planet_screenshot.Apply();
             RenderTexture.active = null;
 
-            Find.WorldCamera.targetTexture = oldTexture;
-            RimWorld.Planet.WorldCameraManager.WorldSkyboxCamera.targetTexture = oldSkyboxTexture;
-            Find.World.renderer.wantedMode = RimWorld.Planet.WorldRenderMode.None;
-            Find.World.renderer.CheckActivateWorldCamera();
+            worldCamera.targetTexture = oldTexture;
+            worldSkyboxCamera.targetTexture = oldSkyboxTexture;
+            world.renderer.wantedMode = RimWorld.Planet.WorldRenderMode.None;
+            world.renderer.CheckActivateWorldCamera();
+
             // unblock celestial object rendering
             Game.MainLoop.instance.blockRendering = false;
             Game.MainLoop.instance.ForceRender();
@@ -97,15 +112,24 @@ namespace Universum.Utilities {
     public static class SectionLayer_FinalizeMesh {
         public static bool Prefix(SectionLayer __instance, Section ___section) {
             if (!Cache.allowed_utility("universum.vacuum_overlay")) return true;
+
             if (__instance.GetType().Name != "SectionLayer_Terrain" || !Cache.allowed_utility(___section.map, "universum.vacuum")) return true;
+            
             bool foundSpace = false;
             foreach (IntVec3 cell in ___section.CellRect.Cells) {
                 TerrainDef terrain1 = ___section.map.terrainGrid.TerrainAt(cell);
                 if (Cache.allowed_utility(terrain1, "universum.vacuum_overlay")) {
                     foundSpace = true;
                     Material mat = Globals.planet_mat;
+
                     if (terrain1.defName == "RimNauts2_Vacuum_Glass") mat = Globals.planet_mat_glass;
-                    Printer_Mesh.PrintMesh(__instance, Matrix4x4.TRS(cell.ToVector3() + new Vector3(0.5f, 0f, 0.5f), Quaternion.identity, Vector3.one), MeshMakerPlanes.NewPlaneMesh(1f), mat);
+
+                    Printer_Mesh.PrintMesh(
+                        __instance,
+                        Matrix4x4.TRS(cell.ToVector3() + new Vector3(0.5f, 0f, 0.5f), Quaternion.identity, Vector3.one),
+                        MeshMakerPlanes.NewPlaneMesh(1f),
+                        mat
+                    );
                 }
             }
             if (!foundSpace) {
@@ -127,8 +151,11 @@ namespace Universum.Utilities {
         public static bool MapIsSpace;
 
         public static void Postfix() {
-            if (Find.CurrentMap == null || Scribe.mode != LoadSaveMode.Inactive) return;
-            MapIsSpace = Cache.allowed_utility(Find.CurrentMap, "universum.vacuum");
+            Map map = Find.CurrentMap;
+
+            if (map == null || Scribe.mode != LoadSaveMode.Inactive) return;
+
+            MapIsSpace = Cache.allowed_utility(map, "universum.vacuum");
         }
     }
 
@@ -139,6 +166,7 @@ namespace Universum.Utilities {
     public class Game_LoadGame {
         public static void Postfix() {
             Globals.rendered = false;
+
             MapInterface_Notify_SwitchedMap.Postfix();
         }
     }
@@ -166,12 +194,16 @@ namespace Universum.Utilities {
 
         public static void Prefix() {
             if (!Cache.allowed_utility("universum.vacuum_overlay")) return;
+
             if (!MapInterface_Notify_SwitchedMap.MapIsSpace || !MapSections.ContainsKey(Find.CurrentMap)) return;
+
             Center = GameCamera.transform.position;
             var ratio = (float) UI.screenWidth / UI.screenHeight;
             CellsHigh = UI.screenHeight / Find.CameraDriver.CellSizePixels;
             CellsWide = CellsHigh * ratio;
+
             if ((lastCameraPosition - Center).magnitude < 1e-4) return;
+
             lastCameraPosition = Center;
             var sections = MapSections[Find.CurrentMap];
             var visibleRect = Driver.CurrentViewRect;
@@ -183,14 +215,18 @@ namespace Universum.Utilities {
 
         public static void Postfix() {
             if (!MeshRecalculateHelper.Tasks.Any()) return;
+
             Task.WaitAll(MeshRecalculateHelper.Tasks.ToArray());
             MeshRecalculateHelper.Tasks.Clear();
+
             foreach (var layer in MeshRecalculateHelper.LayersToDraw) {
                 var mesh = layer.GetSubMesh(Globals.planet_mat);
                 var mesh_glass = layer.GetSubMesh(Globals.planet_mat_glass);
+
                 if (!(!mesh.finalized || mesh.disabled)) Graphics.DrawMesh(mesh.mesh, Vector3.zero, Quaternion.identity, mesh.material, 0);
                 if (!(!mesh_glass.finalized || mesh_glass.disabled)) Graphics.DrawMesh(mesh_glass.mesh, Vector3.zero, Quaternion.identity, mesh_glass.material, 0);
             }
+
             MeshRecalculateHelper.LayersToDraw.Clear();
         }
     }
@@ -215,9 +251,11 @@ namespace Universum.Utilities {
 
         public static void recalculate_layer(SectionLayer instance) {
             var mesh = instance.GetSubMesh(Globals.planet_mat);
-            Tasks.Add(Task.Factory.StartNew(() => recalculate_mesh(mesh)));
             var mesh_glass = instance.GetSubMesh(Globals.planet_mat_glass);
-            Tasks.Add(Task.Factory.StartNew(() => recalculate_mesh(mesh_glass)));
+
+            if (mesh.verts.Count > 0) Tasks.Add(Task.Factory.StartNew(() => recalculate_mesh(mesh)));
+            if (mesh_glass.verts.Count > 0) Tasks.Add(Task.Factory.StartNew(() => recalculate_mesh(mesh_glass)));
+
             LayersToDraw.Add(instance);
         }
 
@@ -230,16 +268,20 @@ namespace Universum.Utilities {
                 );
                 return;
             }
+
             lock (mesh) {
                 mesh.finalized = false;
                 mesh.Clear(MeshParts.UVs);
+
                 for (var i = 0; i < mesh.verts.Count; i++) {
                     var xdiff = mesh.verts[i].x - Game_UpdatePlay.Center.x;
                     var xfromEdge = xdiff + Game_UpdatePlay.CellsWide / 2.0f;
                     var zdiff = mesh.verts[i].z - Game_UpdatePlay.Center.z;
                     var zfromEdge = zdiff + Game_UpdatePlay.CellsHigh / 2.0f;
+
                     mesh.uvs.Add(new Vector3(xfromEdge / Game_UpdatePlay.CellsWide, zfromEdge / Game_UpdatePlay.CellsHigh, 0.0f));
                 }
+
                 mesh.FinalizeMesh(MeshParts.UVs);
             }
         }
