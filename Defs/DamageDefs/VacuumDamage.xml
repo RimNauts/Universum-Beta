@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-    <DamageDef>
+    <!--<DamageDef>
         <defName>Universum_Decompression_Damage</defName>
         <label>decompression</label>
         <workerClass>DamageWorker_Frostbite</workerClass>
@@ -9,5 +9,5 @@
         <hediff>Universum_Decompression_Hediff</hediff>
         <harmAllLayersUntilOutside>true</harmAllLayersUntilOutside>
         <canUseDeflectMetalEffect>false</canUseDeflectMetalEffect>
-    </DamageDef>
+    </DamageDef>-->
 </Defs>

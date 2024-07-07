@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-	<WorldObjectDef>
+	<!--<WorldObjectDef>
 		<defName>Universum_ObjectHolder</defName>
 		<worldObjectClass>Universum.World.ObjectHolder</worldObjectClass>
 		<canBePlayerHome>true</canBePlayerHome>
@@ -27,5 +27,5 @@
 				<desc>Randomize properties.</desc>
 			</li>
 		</comps>
-  	</WorldObjectDef>
+  	</WorldObjectDef>-->
 </Defs>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<Universum.Defs.Utility>
+		<defName>Universum_Utility_Vacuum</defName>
+        <id>universum.vacuum</id>
+        <modName>Universum</modName>
+        <labelKey>Universum.Utility.Label.vacuum</labelKey>
+        <descriptionKey>Universum.Utility.Description.vacuum</descriptionKey>
+        <defaultToggle>true</defaultToggle>
+        <hideInSettings>false</hideInSettings>
+	</Universum.Defs.Utility>
+</Defs>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Patch>
-    <Operation Class="PatchOperationConditional">
+    <!--<Operation Class="PatchOperationConditional">
         <xpath>Defs/WeatherDef[defName="Clear"]/eventMakers</xpath>
         <match Class="PatchOperationAdd">
             <xpath>Defs/WeatherDef[defName="Clear"]/eventMakers</xpath>
@@ -183,5 +183,5 @@
                 </eventMakers>
             </value>
         </nomatch>
-    </Operation>
+    </Operation>-->
 </Patch>
