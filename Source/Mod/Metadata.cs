@@ -1,4 +1,4 @@
-﻿using System;
+﻿using UnityEngine;
 
 namespace Universum.Mod;
 
@@ -17,5 +17,15 @@ public class Metadata : Verse.Mod {
         ID = content.ModMetaData.PackageId;
         NAME = content.ModMetaData.Name;
         VERSION = content.ModMetaData.ModVersion;
+
+        modSettings = new Settings();
+    }
+
+    public override void DoSettingsWindowContents(Rect inRect) {
+        ((Settings) modSettings).Window(inRect);
+    }
+
+    public override string SettingsCategory() {
+        return $"{NAME} (v{VERSION})";
     }
 }

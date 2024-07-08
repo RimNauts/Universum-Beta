@@ -58,7 +58,7 @@ public class MainLoop : Verse.GameComponent {
 
     public static readonly CelestialUpdateJob CELESTIAL_UPDATE_JOB = new();
 
-    public MainLoop(Verse.Game game) {
+    public MainLoop() {
         if (instance != null) {
             instance = null;
             GC.Collect();
