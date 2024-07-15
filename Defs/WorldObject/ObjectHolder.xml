@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-	<!--<WorldObjectDef>
+	<WorldObjectDef>
 		<defName>Universum_ObjectHolder</defName>
 		<worldObjectClass>Universum.World.ObjectHolder</worldObjectClass>
 		<canBePlayerHome>true</canBePlayerHome>
@@ -14,18 +14,18 @@
 		</IncidentTargetTags>
 		<comps>
 			<li Class="WorldObjectCompProperties_Abandon"/>
-			<li Class="Universum.World.Comps.DestroyObjectHolder_Properties">
+			<li Class="Universum.World.Comps.DestroyObjectHolderProperties">
 				<label>Destroy</label>
 				<desc>Blast the object out of orbit, never to be seen again.</desc>
 			</li>
-			<li Class="Universum.World.Comps.GenerateObjectHolderMap_Properties">
+			<li Class="Universum.World.Comps.GenerateObjectHolderMapProperties">
 				<label>Generate map</label>
 				<desc>Generate map for the object instantly.</desc>
 			</li>
-			<li Class="Universum.World.Comps.RandomizeObjectHolder_Properties">
+			<li Class="Universum.World.Comps.RandomizeObjectHolderProperties">
 				<label>Randomize</label>
 				<desc>Randomize properties.</desc>
 			</li>
 		</comps>
-  	</WorldObjectDef>-->
+  	</WorldObjectDef>
 </Defs>

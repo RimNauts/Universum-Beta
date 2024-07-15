@@ -19,13 +19,16 @@ public class Metadata : Verse.Mod {
         VERSION = content.ModMetaData.ModVersion;
 
         modSettings = new Settings();
+        modSettings.Mod = this;
     }
 
     public override void DoSettingsWindowContents(Rect inRect) {
-        ((Settings) modSettings).Window(inRect);
+        Settings.Window(inRect);
     }
 
     public override string SettingsCategory() {
         return $"{NAME} (v{VERSION})";
     }
+
+    public override void WriteSettings() { }
 }

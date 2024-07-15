@@ -11,7 +11,7 @@ using HarmonyLib;
 
 namespace Universum.Game.Patch;
 
-public class Game {
+public static class Game {
     [HarmonyPatch]
     static class AddMap {
         public static bool Prepare() => TargetMethod() != null;
@@ -20,16 +20,27 @@ public class Game {
 
         public static void Postfix(Verse.Map map) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
-
             if (mapIndex == -1) return;
 
+            bool removeShadows = Loader.Defs.BiomeProperties[map.Biome.index]
+                .activeUtilities[Cache.Utilities.RemoveShadows.id];
+            Cache.Utilities.Temperature.maps[mapIndex] = removeShadows;
+            if (removeShadows) Cache.Utilities.RemoveShadows.tracker.Subscribe();
+
+            bool hasCustomTemperature = Loader.Defs.BiomeProperties[map.Biome.index]
+                .activeUtilities[Cache.Utilities.Temperature.id];
+            Cache.Utilities.Temperature.maps[mapIndex] = hasCustomTemperature;
+            if (hasCustomTemperature) Cache.Utilities.Temperature.tracker.Subscribe();
+
             bool isOuterSpace = Loader.Defs.BiomeProperties[map.Biome.index]
-                .activeUtilities[Cache.Utilities.Vacuum.index];
-            Cache.Utilities.Vacuum.mapIsOuterSpace[mapIndex] = isOuterSpace;
+                .activeUtilities[Cache.Utilities.Vacuum.id];
+            Cache.Utilities.Vacuum.maps[mapIndex] = isOuterSpace;
+            if (isOuterSpace) Cache.Utilities.Vacuum.tracker.Subscribe();
 
-            if (!isOuterSpace) return;
-
-            Cache.Utilities.Vacuum.tracker.Subscribe();
+            bool weatherNotChangeable = Loader.Defs.BiomeProperties[map.Biome.index]
+                .activeUtilities[Cache.Utilities.WeatherChanger.id];
+            Cache.Utilities.Vacuum.maps[mapIndex] = weatherNotChangeable;
+            if (weatherNotChangeable) Cache.Utilities.WeatherChanger.tracker.Subscribe();
         }
     }
 
@@ -41,13 +52,27 @@ public class Game {
 
         public static void Prefix(Verse.Map map, bool notifyPlayer) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
-
             if (mapIndex == -1) return;
 
-            if (!Cache.Utilities.Vacuum.mapIsOuterSpace[mapIndex]) return;
+            if (Cache.Utilities.RemoveShadows.maps[mapIndex]) {
+                Cache.Utilities.RemoveShadows.maps[mapIndex] = false;
+                Cache.Utilities.RemoveShadows.tracker.Unsubscribe();
+            }
 
-            Cache.Utilities.Vacuum.mapIsOuterSpace[mapIndex] = false;
-            Cache.Utilities.Vacuum.tracker.Unsubscribe();
+            if (Cache.Utilities.Temperature.maps[mapIndex]) {
+                Cache.Utilities.Temperature.maps[mapIndex] = false;
+                Cache.Utilities.Temperature.tracker.Unsubscribe();
+            }
+
+            if (Cache.Utilities.Vacuum.maps[mapIndex]) {
+                Cache.Utilities.Vacuum.maps[mapIndex] = false;
+                Cache.Utilities.Vacuum.tracker.Unsubscribe();
+            }
+
+            if (Cache.Utilities.WeatherChanger.maps[mapIndex]) {
+                Cache.Utilities.WeatherChanger.maps[mapIndex] = false;
+                Cache.Utilities.WeatherChanger.tracker.Unsubscribe();
+            }
         }
     }
 
@@ -62,13 +87,25 @@ public class Game {
             int mapCount = maps.Count;
 
             for (int mapIndex = 0; mapIndex < mapCount; mapIndex++) {
+                bool removeShadows = Loader.Defs.BiomeProperties[maps[mapIndex].Biome.index]
+                    .activeUtilities[Cache.Utilities.RemoveShadows.id];
+                Cache.Utilities.RemoveShadows.maps[mapIndex] = removeShadows;
+                if (removeShadows) Cache.Utilities.RemoveShadows.tracker.Subscribe();
+                
+                bool hasCustomTemperature = Loader.Defs.BiomeProperties[maps[mapIndex].Biome.index]
+                    .activeUtilities[Cache.Utilities.Temperature.id];
+                Cache.Utilities.Temperature.maps[mapIndex] = hasCustomTemperature;
+                if (hasCustomTemperature) Cache.Utilities.Temperature.tracker.Subscribe();
+                
                 bool isOuterSpace = Loader.Defs.BiomeProperties[maps[mapIndex].Biome.index]
-                    .activeUtilities[Cache.Utilities.Vacuum.index];
-                Cache.Utilities.Vacuum.mapIsOuterSpace[mapIndex] = isOuterSpace;
+                    .activeUtilities[Cache.Utilities.Vacuum.id];
+                Cache.Utilities.Vacuum.maps[mapIndex] = isOuterSpace;
+                if (isOuterSpace) Cache.Utilities.Vacuum.tracker.Subscribe();
 
-                if (!isOuterSpace) return;
-
-                Cache.Utilities.Vacuum.tracker.Subscribe();
+                bool weatherNotChangeable = Loader.Defs.BiomeProperties[maps[mapIndex].Biome.index]
+                    .activeUtilities[Cache.Utilities.WeatherChanger.id];
+                Cache.Utilities.Vacuum.maps[mapIndex] = weatherNotChangeable;
+                if (weatherNotChangeable) Cache.Utilities.WeatherChanger.tracker.Subscribe();
             }
         }
     }

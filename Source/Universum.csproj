@@ -28,7 +28,4 @@
 	<ItemGroup>
 		<Publicize Include="Assembly-CSharp;UnityEngine.CoreModule" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Colony\" />
-	</ItemGroup>
 </Project>

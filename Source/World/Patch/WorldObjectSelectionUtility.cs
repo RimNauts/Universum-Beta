@@ -19,6 +19,7 @@ public class WorldObjectSelectionUtility {
 
         public static bool Prefix(RimWorld.Planet.WorldObject o, ref bool __result) {
             if (o is not ObjectHolder objectHolder) return true;
+            
             __result = objectHolder.hideIcon;
             return false;
 

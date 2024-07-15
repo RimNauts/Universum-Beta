@@ -6,11 +6,9 @@ namespace Universum.Mod;
 [Verse.StaticConstructorOnStartup]
 public static class Manager {
     public static readonly Metadata METADATA;
-    public static readonly Harmony HARMONY;
-    
+
     static Manager() {
         METADATA = Metadata.Instance;
-
         
         Debugger.Log(
             key: "Universum.Info.mod_loaded",
@@ -19,10 +17,16 @@ public static class Manager {
 
         Loader.Defs.Init();
         Loader.Assets.Init();
+        Settings.Init();
         
-        HARMONY = new Harmony(METADATA.ID);
-        HARMONY.PatchAll(Assembly.GetExecutingAssembly());
+        Harmony harmony = new Harmony(METADATA.ID);
+        harmony.PatchAll(Assembly.GetExecutingAssembly());
         
-        Cache.Utilities.Vacuum.Init(HARMONY);
+        Cache.Utilities.OceanMasking.Init(harmony);
+        Cache.Utilities.RemoveShadows.Init(harmony);
+        Cache.Utilities.Temperature.Init(harmony);
+        Cache.Utilities.Vacuum.Init(harmony);
+        Cache.Utilities.VacuumDamage.Init();
+        Cache.Utilities.WeatherChanger.Init(harmony);
     }
 }

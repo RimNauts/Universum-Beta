@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Universum.World.Patch;
 
-public class WorldRendererUtility {
+public static class WorldRendererUtility {
     [HarmonyPatch]
     static class HiddenBehindTerrainNow {
         public static bool Prepare() => TargetMethod() != null;
@@ -22,7 +22,7 @@ public class WorldRendererUtility {
 
         public static bool Prefix(Vector3 pos, ref bool __result) {
             // ignore icons on surface (settlements)
-            if (Vector3.Distance(pos, Game.MainLoop.instance.currentSphereFocusPoint) < 110) return true;
+            if (Vector3.Distance(pos, Game.MainLoop.instance.currentSphereFocusPoint) < 110.0f) return true;
 
             __result = ShouldHide(pos);
             return false;
@@ -47,16 +47,16 @@ public class WorldRendererUtility {
         Vector3 normalized = pos.normalized;
         float mag = pos.magnitude;
         float angleWithFocus = Vector3.Angle(normalized, Game.MainLoop.instance.currentSphereFocusPoint);
-        bool hideBasedOnAltitude = angleWithFocus > (Math.Acos(115 / alt) + Math.Acos(115 / mag)) * (degree / 3.14d);
+        bool hideBasedOnAltitude = angleWithFocus > (Math.Acos(115.0f / alt) + Math.Acos(115.0f / mag)) * (degree / 3.14d);
 
-        if (mag < 115) return angleWithFocus > 73.0f;
+        if (mag < 115.0f) return angleWithFocus > 73.0f;
         return hideBasedOnAltitude;
     }
 
     private static float _CalculateDegreeBasedOnAltitude(float altitudePercent) {
-        float baseDegree = 165 + (15 * altitudePercent * 1.5f);
-        if (baseDegree > 180) {
-            return 180;
+        float baseDegree = 165.0f + 15.0f * altitudePercent * 1.5f;
+        if (baseDegree > 180.0f) {
+            return 180.0f;
         }
 
         var altitudeRanges = new List<(float Min, float Max, float Value)> {

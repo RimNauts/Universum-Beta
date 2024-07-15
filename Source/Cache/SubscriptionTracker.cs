@@ -3,12 +3,16 @@ using HarmonyLib;
 
 namespace Universum.Cache;
 
-public class SubscriptionTracker(Harmony harmony) {
+public class SubscriptionTracker(Harmony harmony, bool alwaysActive = false) {
     public bool active;
     private int _numSubscribers;
     private bool _settingsEnabled;
     private PatchClassProcessor[] _patches = [];
     private int _numPatches;
+
+    public void Init() {
+        if (alwaysActive) Subscribe();
+    }
 
     public void AddPatches(Type[] classesToPatch) {
         if (classesToPatch == null) return;
@@ -38,7 +42,7 @@ public class SubscriptionTracker(Harmony harmony) {
     public void Reset() {
         if (_numSubscribers == 0) return;
         
-        _numSubscribers = 0;
+        _numSubscribers = alwaysActive ? 1 : 0;
 
         UpdateActiveState();
     }
@@ -51,7 +55,7 @@ public class SubscriptionTracker(Harmony harmony) {
         UpdateActiveState();
     }
     
-    public void UpdateActiveState() {
+    private void UpdateActiveState() {
         bool shouldBeActive = _numSubscribers > 0 && _settingsEnabled;
 
         if (active == shouldBeActive) return;

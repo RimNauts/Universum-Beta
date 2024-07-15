@@ -57,13 +57,17 @@ public class MainLoop : Verse.GameComponent {
     private Thread _visualGenerationWorker;
 
     public static readonly CelestialUpdateJob CELESTIAL_UPDATE_JOB = new();
+    
+    private readonly int UTILITY_MAIN_LOOP_PARALLELIZATION_ID = Loader.Defs.UtilityId["universum.main_loop_parallelization"];
 
-    public MainLoop() {
+    // ReSharper disable once UnusedParameter.Local
+    public MainLoop(Verse.Game game) {
         if (instance != null) {
             instance = null;
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
+        
         instance = this;
     }
 
@@ -213,7 +217,7 @@ public class MainLoop : Verse.GameComponent {
     }
 
     private void _Update() {
-        if (Utilities.Cache.allowed_utility("universum.main_loop_parallelization")) {
+        if (Cache.Settings.UtilityEnabled(UTILITY_MAIN_LOOP_PARALLELIZATION_ID)) {
             CELESTIAL_UPDATE_JOB.celestialObjects = _celestialObjectsCache;
             new ManagedJobParallelFor(CELESTIAL_UPDATE_JOB).Schedule(_totalCelestialObjectsCached, 400).Complete();
 
@@ -243,17 +247,18 @@ public class MainLoop : Verse.GameComponent {
             _camera.farClipPlane = 500.0f + World.Patch.WorldCameraDriver.MAX_ALTITUDE;
             _camera.fieldOfView = World.Patch.WorldCameraDriver.FIELD_OF_VIEW;
             RimWorld.Planet.WorldCameraManager.worldSkyboxCameraInt.farClipPlane = 500.0f + World.Patch.WorldCameraDriver.MAX_ALTITUDE;
+            Debugger.Log(message:"NEW CAM PROPS");
         }
 
         for (int i = 0; i < _celestialObjects.Count; i++) {
-            if (_celestialObjects[i].ShouldDespawn()) {
-                for (int j = 0; j < _celestialObjects.Count; j++) {
-                    if (_celestialObjects[j].targetId == _celestialObjects[i].id) _celestialObjects[j].SetTarget(target: null);
-                }
-
-                _celestialObjects[i].Destroy();
-                _celestialObjects[i] = null;
+            if (!_celestialObjects[i].ShouldDespawn()) continue;
+            
+            for (int j = 0; j < _celestialObjects.Count; j++) {
+                if (_celestialObjects[j].targetId == _celestialObjects[i].id) _celestialObjects[j].SetTarget(target: null);
             }
+
+            _celestialObjects[i].Destroy();
+            _celestialObjects[i] = null;
         }
         _celestialObjects = _celestialObjects.Where(item => item != null).ToList();
 
@@ -371,8 +376,8 @@ public class MainLoop : Verse.GameComponent {
     }
 
     private void _PostLoadData() {
-        World.Initialization.nextId = 0;
-        if (_exposeCelestialObjectIds is not null && _exposeCelestialObjectIds.Count > 0) World.Initialization.nextId = _exposeCelestialObjectIds.Max() ?? 0;
+        World.Initialization.NextId = 0;
+        if (_exposeCelestialObjectIds is not null && _exposeCelestialObjectIds.Count > 0) World.Initialization.NextId = _exposeCelestialObjectIds.Max() ?? 0;
 
         World.Initialization.Create(
             _exposeCelestialObjectDefNames,

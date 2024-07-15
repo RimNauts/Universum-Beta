@@ -10,7 +10,7 @@ using HarmonyLib;
 
 namespace Universum.Cache.Patch;
 
-public class MemoryUtility {
+public static class MemoryUtility {
     [HarmonyPatch]
     static class ClearAllMapsAndWorld {
         public static bool Prepare() => TargetMethod() != null;
@@ -25,7 +25,12 @@ public class MemoryUtility {
             
             ObjectHolder.Clear();
             
+            Utilities.OceanMasking.Reset();
+            Utilities.RemoveShadows.Reset();
+            Utilities.Temperature.Reset();
             Utilities.Vacuum.Reset();
+            Utilities.VacuumDamage.Reset();
+            Utilities.WeatherChanger.Reset();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
@@ -12,20 +11,33 @@ using UnityEngine;
 
 namespace Universum.World.Patch;
 
-public class WorldCameraDriver {
+public static class WorldCameraDriver {
+    private const string TYPE_NAME = "RimWorld.Planet.WorldCameraDriver";
     public const float FIELD_OF_VIEW = 40.0f;
     public const float MAX_ALTITUDE = 1600.0f;
     private const float MIN_ALTITUDE = 80.0f;
     private const float ZOOM_ENUM_MULTIPLIER = 0.2f;
     private const float DRAG_SENSITIVITY_MULTIPLIER = 0.5f;
     private const float ZOOM_SENSITIVITY_MULTIPLIER = 0.75f;
-    private const float DRAG_VELOCITY_MULTIPLIER = 0.50f;
+    private const float DRAG_VELOCITY_MULTIPLIER = 0.5f;
     
     [HarmonyPatch]
     static class JumpTo {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:JumpTo";
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldCameraDriver:JumpTo", new System.Type[] { typeof(int) });
+        public static bool Prepare() {
+            if (TargetMethod() != null) return true;
+            
+            Debugger.Log(
+                key: "Universum.Error.FailedToPatch",
+                prefix: $"{Mod.Manager.METADATA.NAME}: ",
+                args: [METHOD_NAME],
+                severity: Debugger.Severity.Error
+            );
+            return false;
+        }
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME, [typeof(int)]);
 
         public static bool Prefix(ref RimWorld.Planet.WorldCameraDriver __instance, int tile) {
             ObjectHolder objectHolder = Cache.ObjectHolder.Get(tile);
@@ -39,9 +51,21 @@ public class WorldCameraDriver {
 
     [HarmonyPatch]
     static class AltitudePercent {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:get_AltitudePercent";
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldCameraDriver:get_AltitudePercent");
+        public static bool Prepare() {
+            if (TargetMethod() != null) return true;
+            
+            Debugger.Log(
+                key: "Universum.Error.FailedToPatch",
+                prefix: $"{Mod.Manager.METADATA.NAME}: ",
+                args: [METHOD_NAME],
+                severity: Debugger.Severity.Error
+            );
+            return false;
+        }
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static bool Prefix(ref RimWorld.Planet.WorldCameraDriver __instance, ref float __result) {
             __result = Mathf.InverseLerp(RimWorld.Planet.WorldCameraDriver.MinAltitude, MAX_ALTITUDE, __instance.altitude);
@@ -51,42 +75,83 @@ public class WorldCameraDriver {
 
     [HarmonyPatch]
     static class MinAltitude {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:get_MinAltitude";
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldCameraDriver:get_MinAltitude");
+        public static bool Prepare() {
+            if (TargetMethod() != null) return true;
+            
+            Debugger.Log(
+                key: "Universum.Error.FailedToPatch",
+                prefix: $"{Mod.Manager.METADATA.NAME}: ",
+                args: [METHOD_NAME],
+                severity: Debugger.Severity.Error
+            );
+            return false;
+        }
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static bool Prefix(ref float __result) {
-            __result = (float) (MIN_ALTITUDE + (Verse.Steam.SteamDeck.IsSteamDeck ? 17.0 : 25.0));
+            __result = MIN_ALTITUDE + (Verse.Steam.SteamDeck.IsSteamDeck ? 17.0f : 25.0f);
             return false;
         }
     }
 
     [HarmonyPatch]
     static class CurrentZoom {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:get_CurrentZoom";
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldCameraDriver:get_CurrentZoom");
+        public static bool Prepare() {
+            if (TargetMethod() != null) return true;
+            
+            Debugger.Log(
+                key: "Universum.Error.FailedToPatch",
+                prefix: $"{Mod.Manager.METADATA.NAME}: ",
+                args: [METHOD_NAME],
+                severity: Debugger.Severity.Error
+            );
+            return false;
+        }
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static bool Prefix(ref RimWorld.Planet.WorldCameraDriver __instance, ref RimWorld.Planet.WorldCameraZoomRange __result) {
             float altitudePercent = __instance.AltitudePercent;
+            
             if (altitudePercent < 0.025 * ZOOM_ENUM_MULTIPLIER) {
                 __result = RimWorld.Planet.WorldCameraZoomRange.VeryClose;
                 return false;
             }
+            
             if (altitudePercent < 0.042 * ZOOM_ENUM_MULTIPLIER) {
                 __result = RimWorld.Planet.WorldCameraZoomRange.Close;
                 return false;
             }
-            __result = altitudePercent < (0.125 * ZOOM_ENUM_MULTIPLIER) ? RimWorld.Planet.WorldCameraZoomRange.Far : RimWorld.Planet.WorldCameraZoomRange.VeryFar;
+            
+            __result = altitudePercent < 0.125 * ZOOM_ENUM_MULTIPLIER
+                ? RimWorld.Planet.WorldCameraZoomRange.Far
+                : RimWorld.Planet.WorldCameraZoomRange.VeryFar;
             return false;
         }
     }
 
     [HarmonyPatch]
     static class WorldCameraDriverOnGUI {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:WorldCameraDriverOnGUI";
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldCameraDriver:WorldCameraDriverOnGUI");
+        public static bool Prepare() {
+            if (TargetMethod() != null) return true;
+            
+            Debugger.Log(
+                key: "Universum.Error.FailedToPatch",
+                prefix: $"{Mod.Manager.METADATA.NAME}: ",
+                args: [METHOD_NAME],
+                severity: Debugger.Severity.Error
+            );
+            return false;
+        }
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static bool Prefix(ref RimWorld.Planet.WorldCameraDriver __instance) {
             _UpdateReleasedLeftWhileHoldingMiddle(ref __instance);
@@ -141,17 +206,26 @@ public class WorldCameraDriver {
 
             if (Event.current.type == EventType.ScrollWheel) {
                 num -= Event.current.delta.y * 0.1f;
-                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(RimWorld.ConceptDefOf.WorldCameraMovement, RimWorld.KnowledgeAmount.SpecificInteraction);
+                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(
+                    RimWorld.ConceptDefOf.WorldCameraMovement,
+                    RimWorld.KnowledgeAmount.SpecificInteraction
+                );
             }
 
             if (RimWorld.KeyBindingDefOf.MapZoom_In.KeyDownEvent) {
                 num += 2f;
-                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(RimWorld.ConceptDefOf.WorldCameraMovement, RimWorld.KnowledgeAmount.SpecificInteraction);
+                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(
+                    RimWorld.ConceptDefOf.WorldCameraMovement,
+                    RimWorld.KnowledgeAmount.SpecificInteraction
+                );
             }
 
             if (RimWorld.KeyBindingDefOf.MapZoom_Out.KeyDownEvent) {
                 num -= 2f;
-                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(RimWorld.ConceptDefOf.WorldCameraMovement, RimWorld.KnowledgeAmount.SpecificInteraction);
+                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(
+                    RimWorld.ConceptDefOf.WorldCameraMovement,
+                    RimWorld.KnowledgeAmount.SpecificInteraction
+                );
             }
 
             __instance.desiredAltitude -= num * (__instance.config.zoomSpeed * ZOOM_SENSITIVITY_MULTIPLIER) * __instance.altitude / 12.0f;
@@ -163,31 +237,55 @@ public class WorldCameraDriver {
 
             if (RimWorld.KeyBindingDefOf.MapDolly_Left.IsDown) {
                 __instance.desiredRotation.x = -__instance.config.dollyRateKeys;
-                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(RimWorld.ConceptDefOf.WorldCameraMovement, RimWorld.KnowledgeAmount.SpecificInteraction);
+                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(
+                    RimWorld.ConceptDefOf.WorldCameraMovement,
+                    RimWorld.KnowledgeAmount.SpecificInteraction
+                );
             }
 
             if (RimWorld.KeyBindingDefOf.MapDolly_Right.IsDown) {
                 __instance.desiredRotation.x = __instance.config.dollyRateKeys;
-                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(RimWorld.ConceptDefOf.WorldCameraMovement, RimWorld.KnowledgeAmount.SpecificInteraction);
+                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(
+                    RimWorld.ConceptDefOf.WorldCameraMovement,
+                    RimWorld.KnowledgeAmount.SpecificInteraction
+                );
             }
 
             if (RimWorld.KeyBindingDefOf.MapDolly_Up.IsDown) {
                 __instance.desiredRotation.y = __instance.config.dollyRateKeys;
-                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(RimWorld.ConceptDefOf.WorldCameraMovement, RimWorld.KnowledgeAmount.SpecificInteraction);
+                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(
+                    RimWorld.ConceptDefOf.WorldCameraMovement,
+                    RimWorld.KnowledgeAmount.SpecificInteraction
+                );
             }
 
             if (RimWorld.KeyBindingDefOf.MapDolly_Down.IsDown) {
                 __instance.desiredRotation.y = -__instance.config.dollyRateKeys;
-                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(RimWorld.ConceptDefOf.WorldCameraMovement, RimWorld.KnowledgeAmount.SpecificInteraction);
+                RimWorld.PlayerKnowledgeDatabase.KnowledgeDemonstrated(
+                    RimWorld.ConceptDefOf.WorldCameraMovement,
+                    RimWorld.KnowledgeAmount.SpecificInteraction
+                );
             }
         }
     }
 
     [HarmonyPatch]
     static class Update {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:Update";
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldCameraDriver:Update");
+        public static bool Prepare() {
+            if (TargetMethod() != null) return true;
+            
+            Debugger.Log(
+                key: "Universum.Error.FailedToPatch",
+                prefix: $"{Mod.Manager.METADATA.NAME}: ",
+                args: [METHOD_NAME],
+                severity: Debugger.Severity.Error
+            );
+            return false;
+        }
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static bool Prefix(ref RimWorld.Planet.WorldCameraDriver __instance) {
             if (Verse.LongEventHandler.ShouldWaitForEvent)
@@ -201,7 +299,7 @@ public class WorldCameraDriver {
                     float num = (float) ((__instance.altitude - (double) RimWorld.Planet.WorldCameraDriver.MinAltitude) / (MAX_ALTITUDE - (double) RimWorld.Planet.WorldCameraDriver.MinAltitude) * 0.850000023841858 + 0.150000005960464);
                     __instance.rotationVelocity = new Vector2(curInputDollyVect.x, curInputDollyVect.y) * num;
                 }
-                if ((!Input.GetMouseButton(2) || Verse.Steam.SteamDeck.IsSteamDeck && __instance.releasedLeftWhileHoldingMiddle) && __instance.dragTimeStamps.Any()) {
+                if ((!Input.GetMouseButton(2) || Verse.Steam.SteamDeck.IsSteamDeck && __instance.releasedLeftWhileHoldingMiddle) && __instance.dragTimeStamps.Count != 0) {
                     __instance.rotationVelocity += Verse.CameraDriver.GetExtraVelocityFromReleasingDragButton(__instance.dragTimeStamps, 5f * DRAG_VELOCITY_MULTIPLIER);
                     __instance.dragTimeStamps.Clear();
                 }

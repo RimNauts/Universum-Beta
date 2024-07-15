@@ -7,9 +7,13 @@ namespace Universum.Loader;
 public static class Defs {
     public static RimWorld.WorldObjectDef ObjectHolderDef { get; private set; }
     public static RimWorld.BiomeDef OceanBiomeDef { get; private set; }
+    public static Verse.DamageDef DecompressionDamageDef { get; private set; }
+    public static Verse.HediffDef SuffocationHediffDef { get; private set; }
     public static Dictionary<string, Universum.Defs.Utility> Utilities { get; private set; }
     public static Dictionary<string, int> UtilityId { get; private set; }
+    public static int TotalUtilities { get; private set; }
     public static Dictionary<string, Universum.Defs.CelestialObject> CelestialObjects { get; private set; }
+    public static Dictionary<string, Universum.Defs.ObjectGeneration> CelestialObjectGenerationSteps  { get; private set; }
     public static Dictionary<string, Universum.Defs.ObjectGeneration> CelestialObjectGenerationStartUpSteps  { get; private set; }
     public static Dictionary<string, Universum.Defs.ObjectGeneration> CelestialObjectGenerationRandomSteps { get; private set; }
     public static Dictionary<string, Universum.Defs.Material> Materials { get; private set; }
@@ -19,11 +23,14 @@ public static class Defs {
     public static Universum.Defs.ModExtension.TerrainProperties[] TerrainProperties { get; private set; }
     
     public static void Init() {
-        // ObjectHolderDef = Verse.DefDatabase<RimWorld.WorldObjectDef>.GetNamed("Universum_ObjectHolder");
+        ObjectHolderDef = Verse.DefDatabase<RimWorld.WorldObjectDef>.GetNamed("Universum_ObjectHolder");
         OceanBiomeDef = Verse.DefDatabase<RimWorld.BiomeDef>.GetNamed("Ocean");
+        DecompressionDamageDef = Verse.DefDatabase<Verse.DamageDef>.GetNamed("Universum_Decompression_Damage");
+        SuffocationHediffDef = Verse.DefDatabase<Verse.HediffDef>.GetNamed("Universum_Suffocation_Hediff");
         Utilities = new Dictionary<string, Universum.Defs.Utility>();
         UtilityId = new Dictionary<string, int>();
         CelestialObjects = new Dictionary<string, Universum.Defs.CelestialObject>();
+        CelestialObjectGenerationSteps = new Dictionary<string, Universum.Defs.ObjectGeneration>();
         CelestialObjectGenerationStartUpSteps = new Dictionary<string, Universum.Defs.ObjectGeneration>();
         CelestialObjectGenerationRandomSteps = new Dictionary<string, Universum.Defs.ObjectGeneration>();
         Materials = new Dictionary<string, Universum.Defs.Material>();
@@ -71,6 +78,7 @@ public static class Defs {
             Universum.Defs.Utility utility = utilityList[i];
             Utilities[utility.defName] = utility;
             UtilityId[utility.id] = i;
+            TotalUtilities++;
             
             totalDefsLoaded++;
         }
@@ -84,6 +92,8 @@ public static class Defs {
         
         List<Universum.Defs.ObjectGeneration> objectGenerationList = Verse.DefDatabase<Universum.Defs.ObjectGeneration>.AllDefsListForReading;
         foreach (Universum.Defs.ObjectGeneration objectGeneration in objectGenerationList) {
+            CelestialObjectGenerationSteps[objectGeneration.defName] = objectGeneration;
+            
             switch (objectGeneration.initializationType) {
                 case World.Initialization.Type.StartUp:
                     CelestialObjectGenerationStartUpSteps[objectGeneration.defName] = objectGeneration;

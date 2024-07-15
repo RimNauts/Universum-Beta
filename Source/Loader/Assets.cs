@@ -10,6 +10,12 @@ public static class Assets {
     public static Dictionary<string, Texture2D> Textures { get; private set; }
     public static Dictionary<string, Material> Materials { get; private set; }
     public static GameObject GameObjectWorldText { get; private set; }
+    public static string IndoorsText { get; private set; }
+    public static string CustomIndoorsText { get; private set; }
+    public static string OutdoorsText { get; private set; }
+    public static string CustomOutdoorsText { get; private set; }
+    public static string UnroofedText { get; private set; }
+    public static string CustomUnroofedText { get; private set; }
 
     public static void Init() {
         Shaders = new Dictionary<string, Shader>();
@@ -21,6 +27,13 @@ public static class Assets {
         Shaders["Sprites/Default"] = Shader.Find("Sprites/Default");
         GameObjectWorldText = Resources.Load<GameObject>("Prefabs/WorldText");
 
+        IndoorsText = Verse.TranslatorFormattedStringExtensions.Translate("Indoors");
+        CustomIndoorsText = Verse.TranslatorFormattedStringExtensions.Translate("Universum.indoors");
+        OutdoorsText = Verse.TranslatorFormattedStringExtensions.Translate("Outdoors").CapitalizeFirst();
+        CustomOutdoorsText = Verse.TranslatorFormattedStringExtensions.Translate("Universum.outdoors").CapitalizeFirst();
+        UnroofedText = Verse.TranslatorFormattedStringExtensions.Translate("IndoorsUnroofed");
+        CustomUnroofedText = Verse.TranslatorFormattedStringExtensions.Translate("Universum.unroofed");
+        
         // populate cache
         foreach (var (_, materialDef) in Defs.Materials) {
             Shader shaderInstance = GetShader(materialDef.shaderName);

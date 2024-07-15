@@ -108,7 +108,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         this.seed = seed ?? Verse.Rand.Int;
         rand = new Common.Random(this.seed);
 
-        this.id = id ?? Initialization.nextId++;
+        this.id = id ?? Initialization.NextId++;
 
         this.targetId = targetId ?? -1;
 
@@ -229,7 +229,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
             this.blockRendering = false;
             SetActive(true);
         }
-        if (dirty) _Recache();
+        if (dirty) Recache();
 
         bool updatePosition = positionChanged || Game.MainLoop.instance.forceUpdate;
         bool updateRotation = rotationChanged || Game.MainLoop.instance.forceUpdate;
@@ -251,7 +251,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         }
     }
 
-    protected virtual void _Recache() {
+    protected virtual void Recache() {
         dirty = false;
         if ((generatingVisuals || shape == null) && (generatingVisuals || !icon)) return;
         // generate game object for shape
@@ -380,9 +380,9 @@ public abstract class CelestialObject(string celestialObjectDefName) {
 
     public virtual void GenerateVisuals() {
         if (DEF.shape != null) {
-            _GenerateShape();
+            GenerateShape();
         } else if (DEF.icon != null) {
-            _GenerateIcon();
+            GenerateIcon();
         } else {
             Debugger.Log(
                 key: "Universum.Error.no_shape_icon",
@@ -393,7 +393,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         }
     }
 
-    protected virtual void _GenerateShape() {
+    protected virtual void GenerateShape() {
         generatingVisuals = true;
 
         shape = new Common.Shape(rand);
@@ -449,7 +449,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         dirty = true;
     }
 
-    protected virtual void _GenerateIcon() {
+    protected virtual void GenerateIcon() {
         generatingVisuals = true;
         icon = true;
 

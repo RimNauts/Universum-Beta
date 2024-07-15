@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-    <!--<HediffDef ParentName="InjuryBase">
+    <HediffDef ParentName="InjuryBase">
         <defName>Universum_Decompression_Hediff</defName>
         <label>decompression</label>
         <description>A decompression injury.</description>
@@ -124,5 +124,5 @@
                 </capMods>
             </li>
         </stages>
-    </HediffDef>-->
+    </HediffDef>
 </Defs>
