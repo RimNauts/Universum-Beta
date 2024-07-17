@@ -33,6 +33,24 @@ public static class Assets {
         CustomOutdoorsText = Verse.TranslatorFormattedStringExtensions.Translate("Universum.outdoors").CapitalizeFirst();
         UnroofedText = Verse.TranslatorFormattedStringExtensions.Translate("IndoorsUnroofed");
         CustomUnroofedText = Verse.TranslatorFormattedStringExtensions.Translate("Universum.unroofed");
+    
+        Colony.Patch.SectionLayer.vacuumTerrainMaterial = Verse.MaterialPool.MatFrom(Colony.Patch.MapDrawer.PLANET_SCREENSHOT);
+        Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial = new(Colony.Patch.SectionLayer.vacuumTerrainMaterial);
+        Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial.color = Color.gray;
+        
+        // branch if camera+ patch needs to be applied
+        if (Verse.ModsConfig.IsActive("brrainz.cameraplus")) {
+            Colony.Patch.SectionLayer.vacuumTerrainMaterial.mainTextureOffset = new Vector2(0.3f, 0.3f);
+            Colony.Patch.SectionLayer.vacuumTerrainMaterial.mainTextureScale = new Vector2(0.4f, 0.4f);
+            Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial.mainTextureOffset = new Vector2(0.3f, 0.3f);
+            Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial.mainTextureScale = new Vector2(0.4f, 0.4f);
+            Colony.Patch.MapDrawer.planetRenderAltitude *= 1.6f;
+            
+            Debugger.Log(
+                key: "Universum.Info.camera_patch_applied",
+                prefix: Debugger.TAB
+            );
+        }
         
         // populate cache
         foreach (var (_, materialDef) in Defs.Materials) {

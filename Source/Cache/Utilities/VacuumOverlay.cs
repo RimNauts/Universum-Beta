@@ -2,7 +2,7 @@
 
 namespace Universum.Cache.Utilities;
 
-public static class Temperature {
+public static class VacuumOverlay {
     public static int id;
     
     public static bool[] maps = new bool[128];
@@ -10,16 +10,15 @@ public static class Temperature {
     public static SubscriptionTracker tracker;
 
     public static void Init(Harmony harmony) {
-        Loader.Defs.UtilityId.TryGetValue(key: "universum.temperature", out id);
+        Loader.Defs.UtilityId.TryGetValue(key: "universum.vacuum_overlay", out id);
         
-        tracker = new SubscriptionTracker(harmony);
+        tracker = new SubscriptionTracker(harmony, alwaysActive: true);
         tracker.AddPatches([
-            typeof(Colony.Patch.MapTemperature.OutdoorTemp),
-            typeof(Colony.Patch.MapTemperature.SeasonalTemp),
-            typeof(Colony.Patch.RoomTempTracker.WallEqualizationTempChangePerInterval),
-            typeof(Colony.Patch.RoomTempTracker.ThinRoofEqualizationTempChangePerInterval),
-            typeof(Colony.Patch.RoomTempTracker.EqualizeTemperature),
-            typeof(Colony.Patch.District.OpenRoofCountStopAt)
+            typeof(Colony.Patch.MapDrawer.DrawMapMesh),
+            typeof(Colony.Patch.SectionLayer.FinalizeMesh),
+            typeof(Colony.Patch.SectionLayerTerrain.Regenerate),
+            typeof(Game.Patch.Game.UpdatePlay),
+            typeof(Colony.Patch.Section.FinalizeMesh)
         ]);
         tracker.Init();
     }

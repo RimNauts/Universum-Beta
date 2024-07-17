@@ -27,6 +27,10 @@ public static class Defs {
         OceanBiomeDef = Verse.DefDatabase<RimWorld.BiomeDef>.GetNamed("Ocean");
         DecompressionDamageDef = Verse.DefDatabase<Verse.DamageDef>.GetNamed("Universum_Decompression_Damage");
         SuffocationHediffDef = Verse.DefDatabase<Verse.HediffDef>.GetNamed("Universum_Suffocation_Hediff");
+        Colony.Patch.SectionLayer.vacuumGlassTerrainDef = Verse.DefDatabase<Verse.TerrainDef>.GetNamed(
+            defName: "RimNauts2_Vacuum_Glass",
+            errorOnFail: false
+        );
         Utilities = new Dictionary<string, Universum.Defs.Utility>();
         UtilityId = new Dictionary<string, int>();
         CelestialObjects = new Dictionary<string, Universum.Defs.CelestialObject>();

@@ -30,6 +30,7 @@ public static class MemoryUtility {
             Utilities.Temperature.Reset();
             Utilities.Vacuum.Reset();
             Utilities.VacuumDamage.Reset();
+            Utilities.VacuumOverlay.Reset();
             Utilities.WeatherChanger.Reset();
         }
     }

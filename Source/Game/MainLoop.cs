@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Gilzoide.ManagedJobs;
@@ -8,8 +9,17 @@ using UnityEngine;
 
 namespace Universum.Game;
 
+[SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible")]
 public class MainLoop : Verse.GameComponent {
     public static MainLoop instance;
+    
+    public static RimWorld.Planet.World world;
+    public static Verse.TickManager tickManager;
+    public static RimWorld.Planet.WorldCameraDriver worldCameraDriver;
+    public static Camera worldCamera;
+    public static Camera worldSkyboxCamera;
+    public static Verse.CameraDriver colonyCameraDriver;
+    public static Camera colonyCamera;
 
     private Verse.TickManager _tickManager;
     public int tick;

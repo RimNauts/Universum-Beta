@@ -12,7 +12,10 @@ public static class Settings {
         UTILITY_TOGGLES[id] = value;
         
         if (id == Utilities.OceanMasking.id) Utilities.OceanMasking.tracker.SetSettingsEnabled(value);
+        if (id == Utilities.RemoveShadows.id) Utilities.RemoveShadows.tracker.SetSettingsEnabled(value);
+        if (id == Utilities.Temperature.id) Utilities.Temperature.tracker.SetSettingsEnabled(value);
         if (id == Utilities.Vacuum.id) Utilities.Vacuum.tracker.SetSettingsEnabled(value);
+        if (id == Utilities.VacuumOverlay.id) Utilities.VacuumOverlay.tracker.SetSettingsEnabled(value);
         if (id == Utilities.WeatherChanger.id) Utilities.WeatherChanger.tracker.SetSettingsEnabled(value);
     }
     
@@ -46,9 +49,11 @@ public static class Settings {
         foreach (Defs.Utility utilityDef in Loader.Defs.Utilities.Values) {
             int id = Loader.Defs.UtilityId[utilityDef.id];
 
-            UTILITY_TOGGLES[id] = exposableUtilityToggles.TryGetValue(utilityDef.id, out bool value)
+            bool newValue = exposableUtilityToggles.TryGetValue(utilityDef.id, out bool value)
                 ? value
                 : utilityDef.defaultToggle;
+            
+            SetUtility(id, newValue);
         }
     }
 

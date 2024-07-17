@@ -17,7 +17,6 @@ public static class Manager {
 
         Loader.Defs.Init();
         Loader.Assets.Init();
-        Settings.Init();
         
         Harmony harmony = new Harmony(METADATA.ID);
         harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -27,6 +26,9 @@ public static class Manager {
         Cache.Utilities.Temperature.Init(harmony);
         Cache.Utilities.Vacuum.Init(harmony);
         Cache.Utilities.VacuumDamage.Init();
+        Cache.Utilities.VacuumOverlay.Init(harmony);
         Cache.Utilities.WeatherChanger.Init(harmony);
+        
+        Settings.Init();
     }
 }
