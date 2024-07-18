@@ -5,11 +5,10 @@ namespace Universum.Mod;
 
 [Verse.StaticConstructorOnStartup]
 public static class Manager {
-    public static readonly Metadata METADATA;
+    public static readonly Metadata METADATA = Metadata.Instance;
+    public static readonly Harmony HARMONY = new(METADATA.ID);
 
     static Manager() {
-        METADATA = Metadata.Instance;
-        
         Debugger.Log(
             key: "Universum.Info.mod_loaded",
             args: [METADATA.NAME, METADATA.VERSION]
@@ -18,24 +17,13 @@ public static class Manager {
         Loader.Defs.Init();
         Loader.Assets.Init();
         
-        Harmony harmony = new Harmony(METADATA.ID);
+        Cache.Utilities.Manager.Init();
         
-        Cache.Utilities.OceanMasking.Init(harmony);
-        Cache.Utilities.RemoveShadows.Init(harmony);
-        Cache.Utilities.Temperature.Init(harmony);
-        Cache.Utilities.Vacuum.Init(harmony);
         Cache.Utilities.VacuumDamage.Init();
-        Cache.Utilities.VacuumOverlay.Init(harmony);
-        Cache.Utilities.WeatherChanger.Init(harmony);
         
         Settings.Init();
         
-        harmony.PatchAll(Assembly.GetExecutingAssembly());
-        Cache.Utilities.OceanMasking.tracker.ResetPatching();
-        Cache.Utilities.RemoveShadows.tracker.ResetPatching();
-        Cache.Utilities.Temperature.tracker.ResetPatching();
-        Cache.Utilities.Vacuum.tracker.ResetPatching();
-        Cache.Utilities.VacuumOverlay.tracker.ResetPatching();
-        Cache.Utilities.WeatherChanger.tracker.ResetPatching();
+        HARMONY.PatchAll(Assembly.GetExecutingAssembly());
+        Cache.Utilities.Manager.ResetPatching();
     }
 }

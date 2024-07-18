@@ -29,7 +29,7 @@ public static class SkyManager {
             Verse.Map map = __instance.map;
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex] || !Cache.Utilities.RemoveShadows.maps[mapIndex]) return true;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex] || !Cache.Utilities.Manager.REMOVE_SHADOWS.maps[mapIndex]) return true;
             
             Verse.SkyTarget curSky = __instance.CurrentSkyTarget();
             __instance.curSkyGlowInt = curSky.glow;

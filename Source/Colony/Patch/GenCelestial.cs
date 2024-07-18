@@ -26,9 +26,8 @@ public static class GenCelestial {
             if (tile == -1) return true;
             
             int biomeIndex = Verse.Find.World.grid.tiles.ElementAt(tile).biome.index;
-            bool[] activeUtilities = Loader.Defs.BiomeProperties[biomeIndex].activeUtilities;
 
-            if (!activeUtilities[Cache.Utilities.Vacuum.id] || !activeUtilities[Cache.Utilities.RemoveShadows.id]) {
+            if (!Cache.Utilities.Manager.VACUUM.CheckBiome(biomeIndex) || !Cache.Utilities.Manager.REMOVE_SHADOWS.CheckBiome(biomeIndex)) {
                 return true;
             }
 

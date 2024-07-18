@@ -34,7 +34,7 @@ public static class MapDrawer {
             Verse.Map map = Verse.Find.CurrentMap;
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             
             // block celestial object rendering
             Game.MainLoop.instance.blockRendering = true;

@@ -23,9 +23,10 @@ public static class ExitMapGrid {
         
         public static void Postfix(ref Verse.ExitMapGrid __instance, ref UnityEngine.Color __result) {
             Verse.Map map = __instance.map;
-            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
+            
             __result.a = 0;
         }
     }

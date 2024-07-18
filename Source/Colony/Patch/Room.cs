@@ -25,7 +25,7 @@ public static class Room {
         public static void Postfix(ref Verse.Room __instance) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: __instance.Map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             
             __instance.Notify_RoofChanged();
         }

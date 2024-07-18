@@ -1,27 +1,37 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
 
 namespace Universum.Cache;
 
-public class SubscriptionTracker(Harmony harmony, bool alwaysActive = false) {
+[SuppressMessage("Design", "CA1051:Do not declare visible instance fields")]
+public abstract class SubscriptionTracker {
+    public int id = -1;
     public bool active;
+    private bool _alwaysActive;
     private int _numSubscribers;
     private bool _settingsEnabled;
     private PatchClassProcessor[] _patches = [];
     private int _numPatches;
 
-    public void Init() {
-        if (alwaysActive) Subscribe();
+    public virtual void Init(string key, Type[] classesToPatch = null, bool alwaysActive = false) {
+        Loader.Defs.UtilityId.TryGetValue(key, out id);
+        
+        _alwaysActive = alwaysActive;
+        
+        AddPatches(classesToPatch);
+        
+        if (_alwaysActive) Subscribe();
     }
 
-    public void AddPatches(Type[] classesToPatch) {
+    private void AddPatches(Type[] classesToPatch) {
         if (classesToPatch == null) return;
         
         _numPatches = classesToPatch.Length;
         _patches = new PatchClassProcessor[_numPatches];
 
         for (int i = 0; i < _numPatches; i++) {
-            _patches[i] = new PatchClassProcessor(harmony, classesToPatch[i]);
+            _patches[i] = new PatchClassProcessor(Mod.Manager.HARMONY, classesToPatch[i]);
         }
     }
 
@@ -39,10 +49,12 @@ public class SubscriptionTracker(Harmony harmony, bool alwaysActive = false) {
         UpdateActiveState();
     }
 
-    public void Reset() {
+    public abstract void Reset();
+
+    protected void ResetTracker() {
         if (_numSubscribers == 0) return;
         
-        _numSubscribers = alwaysActive ? 1 : 0;
+        _numSubscribers = _alwaysActive ? 1 : 0;
 
         UpdateActiveState();
     }
@@ -87,4 +99,8 @@ public class SubscriptionTracker(Harmony harmony, bool alwaysActive = false) {
         if (!active) return;
         for (int i = 0; i < _numPatches; i++) _patches[i].Patch();
     }
+
+    public bool CheckBiome(int biomeIndex) => Loader.Defs.BiomeProperties[biomeIndex].activeUtilities[id];
+
+    public bool CheckTerrain(int terrainIndex) => Loader.Defs.TerrainProperties[terrainIndex].activeUtilities[id];
 }

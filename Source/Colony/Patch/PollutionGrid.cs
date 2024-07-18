@@ -21,10 +21,9 @@ public static class PollutionGrid {
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
-
-        public static bool Prefix(Verse.IntVec3 cell, Verse.Map ___map) {
-            return !Loader.Defs.TerrainProperties[___map.terrainGrid.TerrainAt(cell).index]
-                .activeUtilities[Cache.Utilities.Vacuum.id];
+        public static bool Prefix(Verse.IntVec3 cell, bool isPolluted, bool silent, Verse.PollutionGrid __instance) {
+            int terrainIndex = __instance.map.terrainGrid.TerrainAt(cell).index;
+            return !Cache.Utilities.Manager.VACUUM.CheckTerrain(terrainIndex);
         }
     }
 }

@@ -25,7 +25,7 @@ public static class RoomTempTracker {
         public static void Postfix(Verse.RoomTempTracker __instance, ref float __result) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: __instance.Map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex] || !Cache.Utilities.Temperature.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex] || !Cache.Utilities.Manager.TEMPERATURE.maps[mapIndex]) return;
 
             __result *= 0.01f;
         }
@@ -44,7 +44,7 @@ public static class RoomTempTracker {
         public static void Postfix(Verse.RoomTempTracker __instance, ref float __result) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: __instance.Map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex] || !Cache.Utilities.Temperature.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex] || !Cache.Utilities.Manager.TEMPERATURE.maps[mapIndex]) return;
 
             __result *= 0.01f;
         }
@@ -63,7 +63,7 @@ public static class RoomTempTracker {
         public static bool Prefix(ref Verse.RoomTempTracker __instance) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: __instance.Map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex] || !Cache.Utilities.Temperature.maps[mapIndex]) return true;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex] || !Cache.Utilities.Manager.TEMPERATURE.maps[mapIndex]) return true;
             
             if (__instance.room.OpenRoofCount <= 0) return true;
 

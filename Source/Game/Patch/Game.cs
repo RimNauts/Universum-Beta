@@ -53,11 +53,11 @@ public static class Game {
             
             int biomeIndex = map.Biome.index;
 
-            Cache.Utilities.RemoveShadows.UpdateMapValue(mapIndex, biomeIndex);
-            Cache.Utilities.Temperature.UpdateMapValue(mapIndex, biomeIndex);
-            Cache.Utilities.Vacuum.UpdateMapValue(mapIndex, biomeIndex);
-            Cache.Utilities.VacuumOverlay.UpdateMapValue(mapIndex, biomeIndex);
-            Cache.Utilities.WeatherChanger.UpdateMapValue(mapIndex, biomeIndex);
+            Cache.Utilities.Manager.REMOVE_SHADOWS.UpdateMapValue(mapIndex, biomeIndex);
+            Cache.Utilities.Manager.TEMPERATURE.UpdateMapValue(mapIndex, biomeIndex);
+            Cache.Utilities.Manager.VACUUM.UpdateMapValue(mapIndex, biomeIndex);
+            Cache.Utilities.Manager.VACUUM_OVERLAY.UpdateMapValue(mapIndex, biomeIndex);
+            Cache.Utilities.Manager.WEATHER_CHANGER.UpdateMapValue(mapIndex, biomeIndex);
         }
     }
 
@@ -74,24 +74,29 @@ public static class Game {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             if (mapIndex == -1) return;
 
-            if (Cache.Utilities.RemoveShadows.maps[mapIndex]) {
-                Cache.Utilities.RemoveShadows.maps[mapIndex] = false;
-                Cache.Utilities.RemoveShadows.tracker.Unsubscribe();
+            if (Cache.Utilities.Manager.REMOVE_SHADOWS.maps[mapIndex]) {
+                Cache.Utilities.Manager.REMOVE_SHADOWS.maps[mapIndex] = false;
+                Cache.Utilities.Manager.REMOVE_SHADOWS.Unsubscribe();
             }
 
-            if (Cache.Utilities.Temperature.maps[mapIndex]) {
-                Cache.Utilities.Temperature.maps[mapIndex] = false;
-                Cache.Utilities.Temperature.tracker.Unsubscribe();
+            if (Cache.Utilities.Manager.TEMPERATURE.maps[mapIndex]) {
+                Cache.Utilities.Manager.TEMPERATURE.maps[mapIndex] = false;
+                Cache.Utilities.Manager.TEMPERATURE.Unsubscribe();
             }
 
-            if (Cache.Utilities.Vacuum.maps[mapIndex]) {
-                Cache.Utilities.Vacuum.maps[mapIndex] = false;
-                Cache.Utilities.Vacuum.tracker.Unsubscribe();
+            if (Cache.Utilities.Manager.VACUUM.maps[mapIndex]) {
+                Cache.Utilities.Manager.VACUUM.maps[mapIndex] = false;
+                Cache.Utilities.Manager.VACUUM.Unsubscribe();
             }
 
-            if (Cache.Utilities.WeatherChanger.maps[mapIndex]) {
-                Cache.Utilities.WeatherChanger.maps[mapIndex] = false;
-                Cache.Utilities.WeatherChanger.tracker.Unsubscribe();
+            if (Cache.Utilities.Manager.VACUUM_OVERLAY.maps[mapIndex]) {
+                Cache.Utilities.Manager.VACUUM_OVERLAY.maps[mapIndex] = false;
+                Cache.Utilities.Manager.VACUUM_OVERLAY.Unsubscribe();
+            }
+
+            if (Cache.Utilities.Manager.WEATHER_CHANGER.maps[mapIndex]) {
+                Cache.Utilities.Manager.WEATHER_CHANGER.maps[mapIndex] = false;
+                Cache.Utilities.Manager.WEATHER_CHANGER.Unsubscribe();
             }
         }
     }
@@ -112,11 +117,11 @@ public static class Game {
             for (int mapIndex = 0; mapIndex < mapCount; mapIndex++) {
                 int biomeIndex = maps[mapIndex].Biome.index;
                 
-                Cache.Utilities.RemoveShadows.UpdateMapValue(mapIndex, biomeIndex);
-                Cache.Utilities.Temperature.UpdateMapValue(mapIndex, biomeIndex);
-                Cache.Utilities.Vacuum.UpdateMapValue(mapIndex, biomeIndex);
-                Cache.Utilities.VacuumOverlay.UpdateMapValue(mapIndex, biomeIndex);
-                Cache.Utilities.WeatherChanger.UpdateMapValue(mapIndex, biomeIndex);
+                Cache.Utilities.Manager.REMOVE_SHADOWS.UpdateMapValue(mapIndex, biomeIndex);
+                Cache.Utilities.Manager.TEMPERATURE.UpdateMapValue(mapIndex, biomeIndex);
+                Cache.Utilities.Manager.VACUUM.UpdateMapValue(mapIndex, biomeIndex);
+                Cache.Utilities.Manager.VACUUM_OVERLAY.UpdateMapValue(mapIndex, biomeIndex);
+                Cache.Utilities.Manager.WEATHER_CHANGER.UpdateMapValue(mapIndex, biomeIndex);
             }
         }
     }
@@ -182,7 +187,7 @@ public static class Game {
         public static void Prefix() {
             Verse.Map map = Verse.Find.CurrentMap;
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
-            if (mapIndex == -1 || !Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            if (mapIndex == -1 || !Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             if (!MAP_SECTIONS.TryGetValue(map, out Dictionary<Verse.Section, Verse.SectionLayer> sections)) return;
             
             _center = MainLoop.colonyCamera.transform.position;

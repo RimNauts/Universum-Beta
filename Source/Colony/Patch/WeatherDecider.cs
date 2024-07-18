@@ -11,6 +11,7 @@ namespace Universum.Colony.Patch;
 
 public static class WeatherDecider {
     private const string TYPE_NAME = "RimWorld.WeatherDecider";
+    private const string WEATHER_DEF_NAME = "OuterSpaceWeather";
 
     [HarmonyPatch]
     public static class CurrentWeatherCommonality {
@@ -23,7 +24,7 @@ public static class WeatherDecider {
         
         public static bool Prefix(Verse.WeatherDef weather, RimWorld.WeatherDecider __instance, ref float __result) {
             int mapIndex = Verse.Find.Maps.IndexOf(__instance.map);
-            if (!Cache.Utilities.WeatherChanger.maps[mapIndex]) return true;
+            if (!Cache.Utilities.Manager.WEATHER_CHANGER.maps[mapIndex]) return true;
             
             if (__instance.map.weatherManager.curWeather is null || weather == __instance.map.weatherManager.curWeather) {
                 __result = 1.0f;
@@ -31,7 +32,7 @@ public static class WeatherDecider {
             }
             
             // use defName to support SOS2 space weather
-            if (weather.defName == "OuterSpaceWeather") {
+            if (weather.defName == WEATHER_DEF_NAME) {
                 __result = 1.0f;
                 return false;
             }

@@ -25,7 +25,7 @@ public static class MapTemperature {
         public static bool Prefix(ref float __result, Verse.Map ___map) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: ___map);
             
-            if (!Cache.Utilities.Temperature.maps[mapIndex]) return true;
+            if (!Cache.Utilities.Manager.TEMPERATURE.maps[mapIndex]) return true;
 
             __result = Loader.Defs.BiomeProperties[___map.Biome.index].temperature;
             return false;
@@ -45,7 +45,7 @@ public static class MapTemperature {
         public static bool Prefix(ref float __result, Verse.Map ___map) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: ___map);
             
-            if (!Cache.Utilities.Temperature.maps[mapIndex]) return true;
+            if (!Cache.Utilities.Manager.TEMPERATURE.maps[mapIndex]) return true;
 
             __result = Loader.Defs.BiomeProperties[___map.Biome.index].temperature;
             return false;

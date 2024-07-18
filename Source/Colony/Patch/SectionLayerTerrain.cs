@@ -25,7 +25,7 @@ public static class SectionLayerTerrain {
             Verse.Map map = __instance.Map;
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             
             Game.Patch.Game.UpdatePlay.MeshRecalculateHelper.RecalculateLayer(__instance);
         }

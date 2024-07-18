@@ -11,12 +11,7 @@ public static class Settings {
     public static void SetUtility(int id, bool value) {
         UTILITY_TOGGLES[id] = value;
         
-        if (id == Utilities.OceanMasking.id) Utilities.OceanMasking.tracker.SetSettingsEnabled(value);
-        if (id == Utilities.RemoveShadows.id) Utilities.RemoveShadows.tracker.SetSettingsEnabled(value);
-        if (id == Utilities.Temperature.id) Utilities.Temperature.tracker.SetSettingsEnabled(value);
-        if (id == Utilities.Vacuum.id) Utilities.Vacuum.tracker.SetSettingsEnabled(value);
-        if (id == Utilities.VacuumOverlay.id) Utilities.VacuumOverlay.tracker.SetSettingsEnabled(value);
-        if (id == Utilities.WeatherChanger.id) Utilities.WeatherChanger.tracker.SetSettingsEnabled(value);
+        Utilities.Manager.UpdateSettings(id, value);
     }
     
     public static void SetCelestialBodiesCount(string defName, int value) => CELESTIAL_BODIES_COUNT[defName] = value;

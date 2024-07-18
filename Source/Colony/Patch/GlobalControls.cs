@@ -25,9 +25,9 @@ public static class GlobalControls {
             if (__result is null) return;
 
             Verse.Map map = Verse.Find.CurrentMap;
-            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             
             if (__result.Contains(Loader.Assets.IndoorsText)) {
                 __result = __result.Replace(Loader.Assets.IndoorsText, Loader.Assets.CustomIndoorsText);

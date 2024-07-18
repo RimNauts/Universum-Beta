@@ -33,15 +33,13 @@ public static class SectionLayer {
             Verse.Map map = ___section.map;
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             
             bool foundSpace = false;
             foreach (Verse.IntVec3 cell in ___section.CellRect.Cells) {
                 Verse.TerrainDef terrain = map.terrainGrid.TerrainAt(cell);
 
-                if (!Loader.Defs.TerrainProperties[terrain.index].activeUtilities[Cache.Utilities.VacuumOverlay.id]) {
-                    continue;
-                }
+                if (!Cache.Utilities.Manager.VACUUM_OVERLAY.CheckTerrain(terrain.index)) continue;
                 
                 foundSpace = true;
                 Material terrainMaterial = vacuumTerrainMaterial;

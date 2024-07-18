@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using HarmonyLib;
 // ReSharper disable UnusedType.Local
 // ReSharper disable UnusedMember.Local
@@ -26,20 +25,20 @@ public static class District {
             if (__result >= threshold) return;
 
             Verse.Map map = __instance.Map;
+            
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
-            
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
-            
-            IEnumerator<Verse.IntVec3> cells = __instance.Cells.GetEnumerator();
-            Verse.TerrainGrid terrainGrid = map.terrainGrid;
-            
-            while (__result < threshold && cells.MoveNext()) {
-                if (Loader.Defs.TerrainProperties[terrainGrid.TerrainAt(cells.Current).index].activeUtilities[Cache.Utilities.Vacuum.id]) {
-                    __result++;
-                }
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
+
+            Verse.TerrainDef[] cells = map.terrainGrid.topGrid;
+            int totalCells = cells.Length;
+            for (int i = 0; i < totalCells; i++) {
+                if(cells[i] == null) continue;
+                
+                int terrainIndex = cells[i].index;
+                if (!Cache.Utilities.Manager.VACUUM.CheckTerrain(terrainIndex)) continue;
+                
+                __result++;
             }
-            
-            cells.Dispose();
         }
     }
 }

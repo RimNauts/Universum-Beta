@@ -26,7 +26,7 @@ public static class WorldLayer {
             if (__result == -1) return;
             
             if (Loader.Defs.BiomeProperties[Verse.Find.World.grid.tiles.ElementAt(__result).biome.index]
-                .activeUtilities[Cache.Utilities.OceanMasking.id]) __result = -1;
+                .activeUtilities[Cache.Utilities.Manager.OCEAN_MASKING.id]) __result = -1;
         }
     }
 }

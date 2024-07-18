@@ -136,7 +136,6 @@ public class Settings : Verse.ModSettings {
                 LoadData();
                 break;
             case Verse.LoadSaveMode.PostLoadInit:
-                PostLoadData();
                 break;
             case Verse.LoadSaveMode.Inactive:
                 break;
@@ -168,9 +167,5 @@ public class Settings : Verse.ModSettings {
         Cache.Settings.ConvertCelestialBodiesCountFromExposable(exposableCelestialBodiesCount);
         
         Debugger.Log(message: "loaded");
-    }
-
-    private static void PostLoadData() {
-        Cache.Utilities.Vacuum.tracker.SetSettingsEnabled(Cache.Settings.UtilityEnabled(Cache.Utilities.Vacuum.id));
     }
 }

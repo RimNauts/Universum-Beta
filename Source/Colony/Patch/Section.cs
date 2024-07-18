@@ -30,9 +30,9 @@ public static class Section {
         public static void Postfix(Verse.IntVec3 sectCoords, Verse.Map map, ref Verse.Section __instance) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             
-            if (Cache.Utilities.RemoveShadows.tracker.active && Cache.Utilities.RemoveShadows.maps[mapIndex]) {
+            if (Cache.Utilities.Manager.REMOVE_SHADOWS.active && Cache.Utilities.Manager.REMOVE_SHADOWS.maps[mapIndex]) {
                 __instance.layers.RemoveAll(layer => SUN_SHADOWS_TYPE.IsInstanceOfType(layer));
             }
             

@@ -29,13 +29,7 @@ public static class MemoryUtility {
             
             ObjectHolder.Clear();
             
-            Utilities.OceanMasking.Reset();
-            Utilities.RemoveShadows.Reset();
-            Utilities.Temperature.Reset();
-            Utilities.Vacuum.Reset();
-            Utilities.VacuumDamage.Reset();
-            Utilities.VacuumOverlay.Reset();
-            Utilities.WeatherChanger.Reset();
+            Utilities.Manager.Reset();
         }
     }
 }
