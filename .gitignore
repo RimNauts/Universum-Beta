@@ -13,6 +13,7 @@ AssetBuilder
 !AssetBuilder/Assets/BasicShape.shader
 .vscode
 .idea
+Universum-Beta.sln
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
