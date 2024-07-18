@@ -1,84 +1,74 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics.CodeAnalysis;
+using UnityEngine;
 
 namespace Universum.World;
 
+[SuppressMessage("Design", "CA1051:Do not declare visible instance fields")]
 public abstract class ObjectComponent {
-    protected CelestialObject _celestialObject;
-    protected Defs.Component _def;
-    protected GameObject _gameObject;
-    protected bool _active = true;
-    protected bool _block = false;
+    protected readonly CelestialObject CELESTIAL_OBJECT;
+    protected readonly Defs.Component DEF;
+    protected GameObject gameObject;
+    protected bool active = true;
+    private bool _block;
 
-    protected Vector3 _position = Vector3.zero;
-    protected Quaternion _rotation = Quaternion.identity;
+    protected Vector3 position = Vector3.zero;
+    protected Quaternion rotation = Quaternion.identity;
 
-    protected Vector3 _offset;
-    protected float _hideAtMinAltitude;
-    protected float _hideAtMaxAltitude;
+    protected Vector3 offset;
+    protected readonly float HIDE_AT_MIN_ALTITUDE;
+    protected readonly float HIDE_AT_MAX_ALTITUDE;
 
-    public ObjectComponent(CelestialObject celestialObject, Defs.Component def) {
-        _celestialObject = celestialObject;
-        _def = def;
+    protected ObjectComponent(CelestialObject celestialObject, Defs.Component def) {
+        CELESTIAL_OBJECT = celestialObject;
+        DEF = def;
 
-        _gameObject = Object.Instantiate(Loader.Assets.GameObjectWorldText);
-        Object.DontDestroyOnLoad(_gameObject);
+        gameObject = Object.Instantiate(Loader.Assets.GameObjectWorldText);
+        Object.DontDestroyOnLoad(gameObject);
 
-        _offset = def.offSet;
-        _hideAtMinAltitude = def.hideAtMinAltitude;
-        _hideAtMaxAltitude = def.hideAtMaxAltitude;
+        offset = def.offSet;
+        HIDE_AT_MIN_ALTITUDE = def.hideAtMinAltitude;
+        HIDE_AT_MAX_ALTITUDE = def.hideAtMaxAltitude;
     }
 
     public virtual void Destroy() {
-        if (_gameObject != null) {
-            Object.Destroy(_gameObject);
-            _gameObject = null;
-        }
-    }
-
-    public virtual void UpdateInfo() {
-
-    }
-
-    public virtual void Clear() {
-
-    }
-
-    public virtual void OnWorldSceneActivated() {
+        if (gameObject == null) return;
         
+        Object.Destroy(gameObject);
+        gameObject = null;
     }
 
-    public virtual void OnWorldSceneDeactivated() {
-        
-    }
+    public virtual void UpdateInfo() { }
+
+    public virtual void Clear() { }
+
+    public virtual void OnWorldSceneActivated() { }
+
+    public virtual void OnWorldSceneDeactivated() { }
 
     public virtual void Update() {
         UpdatePosition();
         UpdateRotation();
     }
 
-    public virtual void UpdatePosition() {
-        _position = _celestialObject.transformedPosition + _offset;
+    protected virtual void UpdatePosition() {
+        position = CELESTIAL_OBJECT.transformedPosition + offset;
     }
 
-    public virtual void UpdateRotation() {
-        
-    }
+    protected virtual void UpdateRotation() { }
 
     public virtual void Render() {
         SetActive(!_block);
-        if (!_active) return;
+        if (!active) return;
         UpdateTransformationMatrix();
     }
 
-    public virtual void UpdateTransformationMatrix() {
-        
-    }
+    protected virtual void UpdateTransformationMatrix() { }
 
-    public virtual void SetBlock(bool block) => _block = block;
+    protected virtual void SetBlock(bool block) => _block = block;
 
     public virtual void SetActive(bool active) {
-        if (_active == active) return;
-        _active = active;
-        _gameObject.SetActive(active);
+        if (this.active == active) return;
+        this.active = active;
+        gameObject.SetActive(active);
     }
 }

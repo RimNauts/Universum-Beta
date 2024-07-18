@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using Universum.Mod;
 
 namespace Universum.World;
 
+[SuppressMessage("Naming", "CA1708:Identifiers should differ by more than case")]
 public abstract class CelestialObject(string celestialObjectDefName) {
     public enum OrbitDirection {
         Left = 0,
@@ -75,15 +77,15 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         if (components != null) for (int i = 0; i < components.Length; i++) components[i]?.Destroy();
         if (transforms != null) {
             for (int i = 0; i < transforms.Length; i++) {
-                if (transforms[i] != null && transforms[i].gameObject != null) {
-                    UnityEngine.Object.Destroy(transforms[i].gameObject);
-                    transforms[i] = null;
-                }
+                if (transforms[i] == null || transforms[i].gameObject == null) continue;
+                
+                UnityEngine.Object.Destroy(transforms[i].gameObject);
+                transforms[i] = null;
             }
         }
     }
 
-    public virtual void SetActive(bool active) {
+    protected virtual void SetActive(bool active) {
         for (int i = 0; i < transforms.Length; i++) transforms[i].gameObject.SetActive(active);
         for (int i = 0; i < components.Length; i++) components[i].SetActive(active);
     }
@@ -130,20 +132,12 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         UpdateSpeed();
         UpdateOrbitRadius();
 
-        switch (DEF.orbitDirection) {
-            case OrbitDirection.Left:
-                orbitDirection = -1;
-                break;
-            case OrbitDirection.Right:
-                orbitDirection = 1;
-                break;
-            case OrbitDirection.Random:
-                orbitDirection = rand.GetBool() ? 1 : -1;
-                break;
-            default:
-                orbitDirection = 1;
-                break;
-        }
+        orbitDirection = DEF.orbitDirection switch {
+            OrbitDirection.Left => -1,
+            OrbitDirection.Right => 1,
+            OrbitDirection.Random => rand.GetBool() ? 1 : -1,
+            _ => 1
+        };
 
         spinRotationSpeed = rand.GetValueBetween(DEF.spinRotationSpeedBetween);
         float axialAngle = rand.GetValueBetween(DEF.axialAngleBetween);
@@ -181,7 +175,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         objectHolder?.CheckHideIcon();
     }
 
-    public virtual void UpdatePosition(int tick) {
+    protected virtual void UpdatePosition(int tick) {
         positionChanged = true;
 
         double time = speed * tick + timeOffset;
@@ -193,7 +187,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         _localPosition = (inclinationRotation * position) + GetTargetPosition();
     }
 
-    public virtual void UpdateRotation(int tick) {
+    protected virtual void UpdateRotation(int tick) {
         rotationChanged = true;
 
         if (addBillboardRotation) {
@@ -212,7 +206,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         }
     }
 
-    public virtual void UpdateTransformationMatrix() {
+    protected virtual void UpdateTransformationMatrix() {
         transformationMatrix.SetTRS(_localPosition, rotation, scale);
         // update real position
         transformedPosition.x = transformationMatrix.m03;
@@ -221,14 +215,17 @@ public abstract class CelestialObject(string celestialObjectDefName) {
     }
 
     public virtual void Render(bool blockRendering) {
-        if (blockRendering && !this.blockRendering) {
-            this.blockRendering = true;
-            SetActive(false);
+        switch (blockRendering) {
+            case true when !this.blockRendering:
+                this.blockRendering = true;
+                SetActive(false);
+                break;
+            case false when this.blockRendering:
+                this.blockRendering = false;
+                SetActive(true);
+                break;
         }
-        if (!blockRendering && this.blockRendering) {
-            this.blockRendering = false;
-            SetActive(true);
-        }
+
         if (dirty) Recache();
 
         bool updatePosition = positionChanged || Game.MainLoop.instance.forceUpdate;
@@ -258,7 +255,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         if (shape != null) {
             Mesh[] meshes = (Mesh[]) shape.GetMeshes().Clone();
             Material[] materials = (Material[]) shape.GetMaterials().Clone();
-            extraScale = shape.highestElevation;
+            extraScale = shape.HighestElevation;
             shape = null;
 
             transforms = new Transform[meshes.Length];
@@ -303,7 +300,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         foreach (var componentDef in DEF.components) {
             ObjectComponent component = (ObjectComponent) Activator.CreateInstance(
                 componentDef.componentClass,
-                new object[] { this, componentDef }
+                [this, componentDef]
             );
             objectComponents.Add(component);
         }
@@ -343,12 +340,12 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         }
     }
 
-    public virtual void UpdateOrbitRadius() {
+    protected virtual void UpdateOrbitRadius() {
         Vector3 scaledOrbitOffset = GetTargetScale() * orbitPathOffsetPercentage;
         orbitRadius = scaledOrbitOffset.x + ((rand.GetFloat() - 0.5) * (scaledOrbitOffset.x * orbitSpread));
     }
 
-    public virtual void UpdateScale() {
+    protected virtual void UpdateScale() {
         scaleChanged = true;
 
         scale = GetTargetScale() * scalePercentage;
@@ -356,19 +353,19 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         if (DEF.minSize != null && scale.x < (float) DEF.minSize) scale = new Vector3((float) DEF.minSize, (float) DEF.minSize, (float) DEF.minSize);
     }
 
-    public virtual void UpdateSpeed() {
+    protected virtual void UpdateSpeed() {
         speed = GetTargetSpeed() * speedPercentage;
     }
 
-    public virtual Vector3 GetTargetPosition() {
+    protected virtual Vector3 GetTargetPosition() {
         return target?.transformedPosition ?? Vector3.zero;
     }
 
-    public virtual double GetTargetSpeed() {
+    protected virtual double GetTargetSpeed() {
         return target?.speed ?? 0.8;
     }
 
-    public virtual Vector3 GetTargetScale() {
+    protected virtual Vector3 GetTargetScale() {
         return target?.scale ?? new Vector3(100.0f, 100.0f, 100.0f);
     }
 
@@ -386,7 +383,7 @@ public abstract class CelestialObject(string celestialObjectDefName) {
         } else {
             Debugger.Log(
                 key: "Universum.Error.no_shape_icon",
-                prefix: $"{Manager.METADATA.NAME}: ",
+                prefix: $"{Manager.METADATA.Name}: ",
                 args: [DEF.defName],
                 severity: Debugger.Severity.Error
             );

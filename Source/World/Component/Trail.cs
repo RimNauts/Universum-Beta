@@ -12,14 +12,14 @@ public class Trail : ObjectComponent {
     private float _speed;
     
     public Trail(CelestialObject celestialObject, Defs.Component def) : base(celestialObject, def) {
-        _gameObject.GetComponent<TMPro.TextMeshPro>().enabled = false;
-        TRAIL_COMPONENT = _gameObject.AddComponent<TrailRenderer>();
+        gameObject.GetComponent<TMPro.TextMeshPro>().enabled = false;
+        TRAIL_COMPONENT = gameObject.AddComponent<TrailRenderer>();
         
         Loader.Defs.UtilityId.TryGetValue(key: "universum.trails", out UTILITY_ID);
 
         _prevGameSpeed = Verse.TimeSpeed.Paused;
         TRAIL_LENGTH = def.trailLength;
-        TRAIL_COMPONENT.startWidth = _celestialObject.scale.x * def.trailWidth;
+        TRAIL_COMPONENT.startWidth = celestialObject.scale.x * def.trailWidth;
         TRAIL_COMPONENT.endWidth = 0.0f;
         TRAIL_COMPONENT.time = 0.0f;
         TRAIL_COMPONENT.material = Loader.Assets.Materials[def.materialDefName];
@@ -60,15 +60,15 @@ public class Trail : ObjectComponent {
         _speed = (float) Math.Pow(3.0, (double) currentSpeed - 1.0);
     }
 
-    public override void UpdateTransformationMatrix() {
-        TRAIL_COMPONENT.transform.position = _position;
+    protected override void UpdateTransformationMatrix() {
+        TRAIL_COMPONENT.transform.position = position;
         if (_speed <= 0) {
             TRAIL_COMPONENT.time = 0.0f;
         } else TRAIL_COMPONENT.time = TRAIL_LENGTH / _speed;
     }
 
     public override void SetActive(bool active) {
-        if (_active != active) TRAIL_COMPONENT.Clear();
+        if (this.active != active) TRAIL_COMPONENT.Clear();
         base.SetActive(active);
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics.CodeAnalysis;
+using UnityEngine;
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Universum.World.Objects;
 
@@ -26,12 +28,13 @@ public class CrashingAsteroid(string celestialObjectDefName) : CelestialObject(c
         _radiusChangePerTick = (1 - normalizedSpeed) * minRadiusChange + normalizedSpeed * maxRadiusChange;
     }
 
-    public override void UpdatePosition(int tick) {
+    protected override void UpdatePosition(int tick) {
         _AdjustOrbitRadius();
 
         base.UpdatePosition(tick);
     }
 
+    [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code")]
     private void _AdjustOrbitRadius() {
         double direction = orbitRadius < _targetOrbitRadius ? 1.0 : -1.0;
 

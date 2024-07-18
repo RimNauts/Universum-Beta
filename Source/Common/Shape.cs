@@ -16,7 +16,7 @@ public class Shape(Random rand) {
         Plane = 6
     }
 
-    public float highestElevation;
+    public float HighestElevation { get; private set; }
     private List<Mesh> _meshes = [];
     private List<Material> _materials = [];
 
@@ -88,6 +88,9 @@ public class Shape(Random rand) {
                 _materials.Add(material);
                 break;
             case Type.Voronoi:
+                minElevationColor ??= Color.white;
+                maxElevationColor ??= Color.white;
+                
                 mesh = _meshes[_meshes.Count - 1];
                 mesh.ApplyVoronoiPattern(
                     siteCount: detail,
@@ -99,6 +102,8 @@ public class Shape(Random rand) {
                 _materials[_materials.Count - 1] = material;
                 break;
             case Type.Torus:
+                minElevationColor ??= Color.white;
+                
                 mesh.GenerateTorus(
                     radius: 1.0f,
                     tubeRadius: radius,
@@ -120,7 +125,7 @@ public class Shape(Random rand) {
         }
 
         mesh.ApplyNoise(
-            rand.SEED,
+            rand.Seed,
             isMask,
             useMask,
             noiseStrength,
@@ -135,6 +140,6 @@ public class Shape(Random rand) {
             mesh.GenerateColors((Color) minElevationColor, (Color) maxElevationColor);
         }
 
-        if (highestElevation < mesh.maxElevation) highestElevation = mesh.maxElevation;
+        if (HighestElevation < mesh.MaxElevation) HighestElevation = mesh.MaxElevation;
     }
 }

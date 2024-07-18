@@ -10,6 +10,7 @@ using UnityEngine;
 namespace Universum.Game;
 
 [SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible")]
+[SuppressMessage("Design", "CA1051:Do not declare visible instance fields")]
 public class MainLoop : Verse.GameComponent {
     public static MainLoop instance;
     
@@ -21,16 +22,13 @@ public class MainLoop : Verse.GameComponent {
     public static Verse.CameraDriver colonyCameraDriver;
     public static Camera colonyCamera;
 
-    private Verse.TickManager _tickManager;
     public int tick;
     public Verse.TimeSpeed timeSpeed = Verse.TimeSpeed.Paused;
 
-    private Camera _camera;
     public Vector3 cameraPosition;
     public Vector3 cameraUp;
     public Vector3 cameraForward;
 
-    private RimWorld.Planet.WorldCameraDriver _cameraDriver;
     public Vector3 currentSphereFocusPoint;
     public float altitudePercent;
 
@@ -50,7 +48,7 @@ public class MainLoop : Verse.GameComponent {
     public bool worldSceneDeactivated;
     public bool unpaused;
     private int _prevTick;
-    public bool cameraMoved;
+    private bool _cameraMoved;
     private Vector3 _prevCameraPosition;
     private bool _frameChanged;
 
@@ -61,12 +59,12 @@ public class MainLoop : Verse.GameComponent {
     private List<Vector3?> _exposeCelestialObjectPositions = [];
     private List<int?> _exposeCelestialObjectDeathTicks = [];
 
-    public int seed = Verse.Rand.Int;
+    private int _seed = Verse.Rand.Int;
 
     private Queue<World.CelestialObject> _visualGenerationQueue = new();
     private Thread _visualGenerationWorker;
 
-    public static readonly CelestialUpdateJob CELESTIAL_UPDATE_JOB = new();
+    private static readonly CelestialUpdateJob CELESTIAL_UPDATE_JOB = new();
     
     private readonly int UTILITY_MAIN_LOOP_PARALLELIZATION_ID = Loader.Defs.UtilityId["universum.main_loop_parallelization"];
 
@@ -82,7 +80,7 @@ public class MainLoop : Verse.GameComponent {
     }
 
     public void Destroy() {
-        seed = Verse.Rand.Int;
+        _seed = Verse.Rand.Int;
         _visualGenerationWorker.Join();
         
         if (_celestialObjects == null) return;
@@ -112,13 +110,13 @@ public class MainLoop : Verse.GameComponent {
         worldSceneDeactivated = false;
         unpaused = false;
         _prevTick = 0;
-        cameraMoved = false;
+        _cameraMoved = false;
         _frameChanged = false;
-        seed = Verse.Rand.Int;
+        _seed = Verse.Rand.Int;
         _visualGenerationQueue = new Queue<World.CelestialObject>();
         _visualGenerationWorker = null;
 
-        _Recache();
+        Recache();
     }
 
     public override void LoadedGame() {
@@ -126,40 +124,40 @@ public class MainLoop : Verse.GameComponent {
     }
 
     public override void GameComponentTick() {
-        if (_tickManager is null || _tickManager.TicksGame % 10 != 0) return;
+        if (tickManager is null || tickManager.TicksGame % 10 != 0) return;
 
         if (_visualGenerationQueue.Count > 0) dirtyCache = true;
 
         for (int i = 0; i < _totalCelestialObjectsCached; i++) _celestialObjectsCache[i].Tick();
 
-        if (_tickManager.TicksGame < _spawnTickMin) return;
+        if (tickManager.TicksGame < _spawnTickMin) return;
 
         foreach (Defs.ObjectGeneration objectGenerationStep in Loader.Defs.CelestialObjectGenerationRandomSteps.Values) {
             if (!OBJECT_GENERATION_SPAWN_TICK.TryGetValue(objectGenerationStep.defName, out var spawnTick)) continue;
-            if (_tickManager.TicksGame > spawnTick) {
-                World.Initialization.Generate(
-                    objectGenerationStep,
-                    despawnBetweenDays: objectGenerationStep.despawnBetweenDays,
-                    amount: Verse.Rand.Range((int) objectGenerationStep.spawnAmountBetween[0], (int) objectGenerationStep.spawnAmountBetween[1])
-                );
+            if (tickManager.TicksGame <= spawnTick) continue;
+            
+            World.Initialization.Generate(
+                objectGenerationStep,
+                despawnBetweenDays: objectGenerationStep.despawnBetweenDays,
+                amount: Verse.Rand.Range((int) objectGenerationStep.spawnAmountBetween[0], (int) objectGenerationStep.spawnAmountBetween[1])
+            );
 
-                int newSpawnTick = _GetSpawnTick(objectGenerationStep.spawnBetweenDays[0], objectGenerationStep.spawnBetweenDays[1]);
-                _spawnTickMin = newSpawnTick;
+            int newSpawnTick = GetSpawnTick(objectGenerationStep.spawnBetweenDays[0], objectGenerationStep.spawnBetweenDays[1]);
+            _spawnTickMin = newSpawnTick;
 
-                OBJECT_GENERATION_SPAWN_TICK[objectGenerationStep.defName] = newSpawnTick;
-            }
+            OBJECT_GENERATION_SPAWN_TICK[objectGenerationStep.defName] = newSpawnTick;
         }
 
         foreach (var spawnTick in OBJECT_GENERATION_SPAWN_TICK.Values.Where(spawnTick => spawnTick < _spawnTickMin)) _spawnTickMin = spawnTick;
     }
 
     public override void GameComponentUpdate() {
-        _GetFrameData();
-        if (dirtyCache) _Recache();
+        GetFrameData();
+        if (dirtyCache) Recache();
         if (_wait && !forceUpdate) return;
         if (_frameChanged || forceUpdate) {
-            _Update();
-            _Render();
+            Update();
+            Render();
         }
         forceUpdate = false;
     }
@@ -176,34 +174,34 @@ public class MainLoop : Verse.GameComponent {
         dirtyCache = true;
     }
 
-    private static void _ProcessVisualGenerationQueue(Queue<World.CelestialObject> queue) {
-        int currentSeed = instance.seed;
+    private static void ProcessVisualGenerationQueue(Queue<World.CelestialObject> queue) {
+        int currentSeed = instance._seed;
 
         while (queue.Count > 0) {
-            if (instance == null || currentSeed != instance.seed) return;
+            if (instance == null || currentSeed != instance._seed) return;
             World.CelestialObject celestialObject = queue.Dequeue();
             celestialObject?.GenerateVisuals();
         }
     }
 
-    private void _GetFrameData() {
-        if (_tickManager != null) {
-            tick = _tickManager.TicksGame;
-            timeSpeed = _tickManager.curTimeSpeed;
+    private void GetFrameData() {
+        if (tickManager != null) {
+            tick = tickManager.TicksGame;
+            timeSpeed = tickManager.curTimeSpeed;
         }
 
-        if (_camera != null) {
-            cameraPosition = _camera.transform.position;
-            cameraUp = _camera.transform.up;
-            cameraForward = _camera.transform.forward;
+        if (worldCamera != null) {
+            cameraPosition = worldCamera.transform.position;
+            cameraUp = worldCamera.transform.up;
+            cameraForward = worldCamera.transform.forward;
         }
 
-        if (_cameraDriver != null) {
-            currentSphereFocusPoint = _cameraDriver.CurrentlyLookingAtPointOnSphere;
-            altitudePercent = _cameraDriver.AltitudePercent;
+        if (worldCameraDriver != null) {
+            currentSphereFocusPoint = worldCameraDriver.CurrentlyLookingAtPointOnSphere;
+            altitudePercent = worldCameraDriver.AltitudePercent;
         }
 
-        if (_celestialObjects is null || _celestialObjects.Count <= 0 || _tickManager is null) {
+        if (_celestialObjects is null || _celestialObjects.Count <= 0 || tickManager is null) {
             _wait = true;
             return;
         }
@@ -218,16 +216,16 @@ public class MainLoop : Verse.GameComponent {
         worldSceneActivated = sceneSwitched && sceneIsWorld;
         worldSceneDeactivated = sceneSwitched && !sceneIsWorld;
 
-        unpaused = _tickManager.TicksGame != _prevTick;
-        _prevTick = _tickManager.TicksGame;
+        unpaused = tickManager.TicksGame != _prevTick;
+        _prevTick = tickManager.TicksGame;
 
-        cameraMoved = _camera.transform.position != _prevCameraPosition;
-        _prevCameraPosition = _camera.transform.position;
+        _cameraMoved = worldCamera.transform.position != _prevCameraPosition;
+        _prevCameraPosition = worldCamera.transform.position;
 
-        _frameChanged = unpaused || cameraMoved;
+        _frameChanged = unpaused || _cameraMoved;
     }
 
-    private void _Update() {
+    private void Update() {
         if (Cache.Settings.UtilityEnabled(UTILITY_MAIN_LOOP_PARALLELIZATION_ID)) {
             CELESTIAL_UPDATE_JOB.celestialObjects = _celestialObjectsCache;
             new ManagedJobParallelFor(CELESTIAL_UPDATE_JOB).Schedule(_totalCelestialObjectsCached, 400).Complete();
@@ -238,25 +236,21 @@ public class MainLoop : Verse.GameComponent {
         for (int i = 0; i < _totalCelestialObjectsCached; i++) _celestialObjectsCache[i].Update();
     }
 
-    private void _Render() {
+    private void Render() {
         for (int i = 0; i < _totalCelestialObjectsCached; i++) _celestialObjectsCache[i].Render(blockRendering);
     }
 
     public void ForceRender() {
-        _Render();
+        Render();
     }
 
-    private void _Recache() {
+    private void Recache() {
         dirtyCache = false;
         forceUpdate = true;
 
-        _tickManager = Verse.Find.TickManager;
-        _camera = Verse.Find.WorldCamera.GetComponent<Camera>();
-        _cameraDriver = Verse.Find.WorldCameraDriver;
-
-        if (_camera != null) {
-            _camera.farClipPlane = 500.0f + World.Patch.WorldCameraDriver.MAX_ALTITUDE;
-            _camera.fieldOfView = World.Patch.WorldCameraDriver.FIELD_OF_VIEW;
+        if (worldCamera != null) {
+            worldCamera.farClipPlane = 500.0f + World.Patch.WorldCameraDriver.MAX_ALTITUDE;
+            worldCamera.fieldOfView = World.Patch.WorldCameraDriver.FIELD_OF_VIEW;
             RimWorld.Planet.WorldCameraManager.worldSkyboxCameraInt.farClipPlane = 500.0f + World.Patch.WorldCameraDriver.MAX_ALTITUDE;
         }
 
@@ -277,11 +271,11 @@ public class MainLoop : Verse.GameComponent {
 
         for (int i = 0; i < _totalCelestialObjectsCached; i++) _celestialObjectsCache[i] = _celestialObjects[i];
 
-        if (_tickManager != null || _camera != null || _cameraDriver != null) _Update();
+        if (tickManager != null || worldCamera != null || worldCameraDriver != null) Update();
 
         if (OBJECT_GENERATION_SPAWN_TICK.Count == 0) {
             foreach (var step in Loader.Defs.CelestialObjectGenerationRandomSteps.Values) {
-                int spawnTick = _GetSpawnTick(step.spawnBetweenDays[0], step.spawnBetweenDays[1]);
+                int spawnTick = GetSpawnTick(step.spawnBetweenDays[0], step.spawnBetweenDays[1]);
                 if (spawnTick < _spawnTickMin) _spawnTickMin = spawnTick;
 
                 OBJECT_GENERATION_SPAWN_TICK.Add(
@@ -295,14 +289,14 @@ public class MainLoop : Verse.GameComponent {
             Queue<World.CelestialObject> copiedQueue = new Queue<World.CelestialObject>(_visualGenerationQueue);
             _visualGenerationQueue.Clear();
 
-            _visualGenerationWorker = new Thread(() => _ProcessVisualGenerationQueue(copiedQueue));
+            _visualGenerationWorker = new Thread(() => ProcessVisualGenerationQueue(copiedQueue));
             _visualGenerationWorker.Start();
         }
 
         for (int i = 0; i < _totalCelestialObjectsCached; i++) _celestialObjects[i].FindTarget(_celestialObjects);
     }
 
-    public class CelestialUpdateJob : IJobParallelFor {
+    private class CelestialUpdateJob : IJobParallelFor {
         public World.CelestialObject[] celestialObjects = [];
 
         public void Execute(int index) {
@@ -320,18 +314,18 @@ public class MainLoop : Verse.GameComponent {
         dirtyCache = true;
     }
 
-    private int _GetSpawnTick(float betweenDaysMin, float betweenDaysMax) => (int) Verse.Rand.Range(betweenDaysMin * 60000, betweenDaysMax * 60000) + _tickManager.TicksGame;
+    private static int GetSpawnTick(float betweenDaysMin, float betweenDaysMax) => (int) Verse.Rand.Range(betweenDaysMin * 60000, betweenDaysMax * 60000) + tickManager.TicksGame;
 
     public override void ExposeData() {
         switch (Verse.Scribe.mode) {
             case Verse.LoadSaveMode.Saving:
-                _SaveData();
+                SaveData();
                 break;
             case Verse.LoadSaveMode.LoadingVars:
-                _LoadData();
+                LoadData();
                 break;
             case Verse.LoadSaveMode.PostLoadInit:
-                _PostLoadData();
+                PostLoadData();
                 break;
             case Verse.LoadSaveMode.Inactive:
                 break;
@@ -342,7 +336,7 @@ public class MainLoop : Verse.GameComponent {
         }
     }
 
-    private void _SaveData() {
+    private void SaveData() {
         _exposeCelestialObjectDefNames = [];
         _exposeCelestialObjectSeeds = [];
         _exposeCelestialObjectIds = [];
@@ -376,7 +370,7 @@ public class MainLoop : Verse.GameComponent {
         _exposeCelestialObjectDeathTicks = [];
     }
 
-    private void _LoadData() {
+    private void LoadData() {
         Verse.Scribe_Collections.Look(ref _exposeCelestialObjectDefNames, "_exposeCelestialObjectDefNames", Verse.LookMode.Value);
         Verse.Scribe_Collections.Look(ref _exposeCelestialObjectSeeds, "_exposeCelestialObjectSeeds", Verse.LookMode.Value);
         Verse.Scribe_Collections.Look(ref _exposeCelestialObjectIds, "_exposeCelestialObjectIds", Verse.LookMode.Value);
@@ -385,7 +379,7 @@ public class MainLoop : Verse.GameComponent {
         Verse.Scribe_Collections.Look(ref _exposeCelestialObjectDeathTicks, "_exposeCelestialObjectDeathTicks", Verse.LookMode.Value);
     }
 
-    private void _PostLoadData() {
+    private void PostLoadData() {
         World.Initialization.NextId = 0;
         if (_exposeCelestialObjectIds is not null && _exposeCelestialObjectIds.Count > 0) World.Initialization.NextId = _exposeCelestialObjectIds.Max() ?? 0;
 

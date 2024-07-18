@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Universum.Common;
 
 public class Mesh(Random rand) {
-    public float minElevation;
-    public float maxElevation;
+    public float MaxElevation { get; private set; }
+    private float _minElevation;
     private List<Vector3> _vertices = [];
     private List<int> _triangles = [];
     private List<Vector2> _uvs;
@@ -37,8 +37,8 @@ public class Mesh(Random rand) {
         _triangles.AddRange(secondMesh._triangles);
         _colors.AddRange(secondMesh._colors);
 
-        if (minElevation > secondMesh.minElevation) minElevation = secondMesh.minElevation;
-        if (maxElevation < secondMesh.maxElevation) maxElevation = secondMesh.maxElevation;
+        if (_minElevation > secondMesh._minElevation) _minElevation = secondMesh._minElevation;
+        if (MaxElevation < secondMesh.MaxElevation) MaxElevation = secondMesh.MaxElevation;
     }
 
     private void CalculateBounds() {
@@ -128,8 +128,8 @@ public class Mesh(Random rand) {
         List<float> noiseBaseRoughness,
         List<float> noiseMinValue
     ) {
-        minElevation = float.MaxValue;
-        maxElevation = float.MinValue;
+        _minElevation = float.MaxValue;
+        MaxElevation = float.MinValue;
 
         for (int i = 0; i < _vertices.Count; i++) {
             _vertices[i] = SimplexPerlinNoise.ApplyNoiseLayers(
@@ -146,8 +146,8 @@ public class Mesh(Random rand) {
             );
 
             float dist = Vector3.Distance(_vertices[i], Vector3.zero);
-            if (dist < minElevation) minElevation = dist;
-            if (dist > maxElevation) maxElevation = dist;
+            if (dist < _minElevation) _minElevation = dist;
+            if (dist > MaxElevation) MaxElevation = dist;
         }
     }
 
@@ -155,7 +155,7 @@ public class Mesh(Random rand) {
         Color[] newColors = new Color[_vertices.Count];
         for (int i = 0; i < _vertices.Count; i++) {
             float dist = Vector3.Distance(_vertices[i], Vector3.zero);
-            float distNorm = (dist - minElevation) / (maxElevation - minElevation);
+            float distNorm = (dist - _minElevation) / (MaxElevation - _minElevation);
 
             newColors[i] = Color.Lerp(minElevationColor, maxElevationColor, distNorm * 0.9f);
         }

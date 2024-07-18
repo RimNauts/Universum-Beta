@@ -146,7 +146,7 @@ public static class Game {
                 if (info is not Verse.LayerSubMesh mesh) {
                     Debugger.Log(
                         key: "Universum.Error.thread_with_wrong_type",
-                        prefix: $"{Mod.Manager.METADATA.NAME}: ",
+                        prefix: $"{Mod.Manager.METADATA.Name}: ",
                         severity: Debugger.Severity.Error
                     );
                     return;

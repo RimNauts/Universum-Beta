@@ -9,8 +9,6 @@ public class Settings : Verse.ModSettings {
     private static string _inputBuffer;
     
     public static void Init() {
-        /*Cache.Settings.ConvertUtilitiesFromExposable(null);
-        Cache.Settings.ConvertCelestialBodiesCountFromExposable(null);*/
         Manager.METADATA.modSettings = Manager.METADATA.GetSettings<Settings>();
         
         Debugger.Log(
@@ -152,8 +150,6 @@ public class Settings : Verse.ModSettings {
         
         Verse.Scribe_Collections.Look(ref exposableUtilityToggles, "exposableUtilityToggles", Verse.LookMode.Value, Verse.LookMode.Value);
         Verse.Scribe_Collections.Look(ref exposableCelestialBodiesCount, "exposableCelestialBodiesCount", Verse.LookMode.Value, Verse.LookMode.Value);
-        
-        Debugger.Log(message: "saved");
     }
 
     private static void LoadData() {
@@ -165,7 +161,5 @@ public class Settings : Verse.ModSettings {
         
         Cache.Settings.ConvertUtilitiesFromExposable(exposableUtilityToggles);
         Cache.Settings.ConvertCelestialBodiesCountFromExposable(exposableCelestialBodiesCount);
-        
-        Debugger.Log(message: "loaded");
     }
 }

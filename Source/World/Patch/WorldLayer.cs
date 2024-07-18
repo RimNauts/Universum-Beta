@@ -24,9 +24,10 @@ public static class WorldLayer {
 
         public static void Postfix(ref int __result) {
             if (__result == -1) return;
+
+            int biomeIndex = Verse.Find.World.grid.tiles.ElementAt(__result).biome.index;
             
-            if (Loader.Defs.BiomeProperties[Verse.Find.World.grid.tiles.ElementAt(__result).biome.index]
-                .activeUtilities[Cache.Utilities.Manager.OCEAN_MASKING.id]) __result = -1;
+            if (Cache.Utilities.Manager.OCEAN_MASKING.CheckBiome(biomeIndex)) __result = -1;
         }
     }
 }

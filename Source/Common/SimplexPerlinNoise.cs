@@ -9,7 +9,7 @@ namespace Universum.Common;
  *
  * Some changes made by Sindre Eiklid
  */
-public class SimplexPerlinNoise {
+public static class SimplexPerlinNoise {
     // permutation table
     private static readonly int[] SOURCE = [
         151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142,
@@ -34,18 +34,18 @@ public class SimplexPerlinNoise {
     private const double G3 = 1.0 / 6.0;
 
     private static readonly int[][] GRAD3 = [
-        new[] {1, 1, 0},
-        new[] {-1, 1, 0},
-        new[] {1, -1, 0},
-        new[] {-1, -1, 0},
-        new[] {1, 0, 1},
-        new[] {-1, 0, 1},
-        new[] {1, 0, -1},
-        new[] {-1, 0, -1},
-        new[] {0, 1, 1},
-        new[] {0, -1, 1},
-        new[] {0, 1, -1},
-        new[] {0, -1, -1}
+        [1, 1, 0],
+        [-1, 1, 0],
+        [1, -1, 0],
+        [-1, -1, 0],
+        [1, 0, 1],
+        [-1, 0, 1],
+        [1, 0, -1],
+        [-1, 0, -1],
+        [0, 1, 1],
+        [0, -1, 1],
+        [0, 1, -1],
+        [0, -1, -1]
     ];
 
     public static Vector3 ApplyNoiseLayers(
@@ -107,7 +107,7 @@ public class SimplexPerlinNoise {
     /**
      * Generates value, typically in range [-1, 1]
      */
-    public static float Evaluate(Vector3 point, int seed = 0) {
+    private static float Evaluate(Vector3 point, int seed = 0) {
         double x = point.x;
         double y = point.y;
         double z = point.z;

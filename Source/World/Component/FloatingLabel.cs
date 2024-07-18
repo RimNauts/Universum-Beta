@@ -7,7 +7,7 @@ public class FloatingLabel : ObjectComponent {
     private readonly int UTILITY_ID;
     
     public FloatingLabel(CelestialObject celestialObject, Defs.Component def) : base(celestialObject, def) {
-        TEXT_COMPONENT = _gameObject.GetComponent<TMPro.TextMeshPro>();
+        TEXT_COMPONENT = gameObject.GetComponent<TMPro.TextMeshPro>();
         
         Loader.Defs.UtilityId.TryGetValue(key: "universum.labels", out UTILITY_ID);
 
@@ -26,7 +26,7 @@ public class FloatingLabel : ObjectComponent {
 
     public override void UpdateInfo() {
         base.UpdateInfo();
-        TEXT_COMPONENT.text = _def.overwriteText ?? _celestialObject.name;
+        TEXT_COMPONENT.text = DEF.overwriteText ?? CELESTIAL_OBJECT.name;
     }
 
     public override void Update() {
@@ -36,30 +36,30 @@ public class FloatingLabel : ObjectComponent {
         Hide();
     }
 
-    public override void UpdatePosition() {
-        Vector3 position = _celestialObject.transformedPosition + _offset;
+    protected override void UpdatePosition() {
+        Vector3 newPosition = CELESTIAL_OBJECT.transformedPosition + offset;
 
-        Vector3 directionFromObjectToCamera = Game.MainLoop.instance.cameraPosition - position;
+        Vector3 directionFromObjectToCamera = Game.MainLoop.instance.cameraPosition - newPosition;
         directionFromObjectToCamera.Normalize();
 
-        _position = position + directionFromObjectToCamera * (_celestialObject.scale.y + _celestialObject.extraScale) * 1.2f;
-        _position -= Game.MainLoop.instance.cameraUp * (_celestialObject.scale.y + _celestialObject.extraScale) * 1.2f;
+        position = newPosition + directionFromObjectToCamera * (CELESTIAL_OBJECT.scale.y + CELESTIAL_OBJECT.extraScale) * 1.2f;
+        position -= Game.MainLoop.instance.cameraUp * (CELESTIAL_OBJECT.scale.y + CELESTIAL_OBJECT.extraScale) * 1.2f;
     }
 
-    public override void UpdateRotation() {
-        _rotation = Quaternion.LookRotation(Game.MainLoop.instance.cameraForward, Vector3.up);
+    protected override void UpdateRotation() {
+        rotation = Quaternion.LookRotation(Game.MainLoop.instance.cameraForward, Vector3.up);
     }
 
-    public override void UpdateTransformationMatrix() {
-        TEXT_COMPONENT.transform.position = _position;
-        TEXT_COMPONENT.transform.rotation = _rotation;
+    protected override void UpdateTransformationMatrix() {
+        TEXT_COMPONENT.transform.position = position;
+        TEXT_COMPONENT.transform.rotation = rotation;
     }
 
     private void Hide() {
-        float distanceFromCamera = Vector3.Distance(_position, Game.MainLoop.instance.cameraPosition);
+        float distanceFromCamera = Vector3.Distance(position, Game.MainLoop.instance.cameraPosition);
 
-        bool tooClose = distanceFromCamera < _hideAtMinAltitude;
-        bool tooFar = distanceFromCamera > _hideAtMaxAltitude;
+        bool tooClose = distanceFromCamera < HIDE_AT_MIN_ALTITUDE;
+        bool tooFar = distanceFromCamera > HIDE_AT_MAX_ALTITUDE;
         bool outsideRange = tooClose || tooFar;
 
         SetBlock(outsideRange);

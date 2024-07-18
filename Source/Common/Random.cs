@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace Universum.Common;
 
+[SuppressMessage("Security", "CA5394:Do not use insecure randomness")]
 public class Random {
-    public readonly int SEED;
+    public int Seed { get; }
     private readonly System.Random RAND;
 
     public Random(int seed) {
-        SEED = seed;
-        RAND = new System.Random(SEED);
+        Seed = seed;
+        RAND = new System.Random(Seed);
     }
 
     public Quaternion GetRotation() => Quaternion.Euler(GetFloat() * 360, GetFloat() * 360, GetFloat() * 360);

@@ -11,7 +11,7 @@ public static class Manager {
     static Manager() {
         Debugger.Log(
             key: "Universum.Info.mod_loaded",
-            args: [METADATA.NAME, METADATA.VERSION]
+            args: [METADATA.Name, METADATA.Version]
         );
 
         Loader.Defs.Init();

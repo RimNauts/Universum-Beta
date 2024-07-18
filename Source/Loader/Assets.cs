@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable Unity.UnknownResource
 
 namespace Universum.Loader;
 
@@ -23,7 +25,7 @@ public static class Assets {
         Materials = new Dictionary<string, Material>();
         
         GetAssets();
-
+        
         Shaders["Sprites/Default"] = Shader.Find("Sprites/Default");
         GameObjectWorldText = Resources.Load<GameObject>("Prefabs/WorldText");
 
@@ -35,9 +37,10 @@ public static class Assets {
         CustomUnroofedText = Verse.TranslatorFormattedStringExtensions.Translate("Universum.unroofed");
     
         Colony.Patch.SectionLayer.vacuumTerrainMaterial = Verse.MaterialPool.MatFrom(Colony.Patch.MapDrawer.PLANET_SCREENSHOT);
-        Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial = new(Colony.Patch.SectionLayer.vacuumTerrainMaterial);
-        Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial.color = Color.gray;
-        
+        Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial = new Material(Colony.Patch.SectionLayer.vacuumTerrainMaterial) {
+            color = Color.gray
+        };
+
         // branch if camera+ patch needs to be applied
         if (Verse.ModsConfig.IsActive("brrainz.cameraplus")) {
             Colony.Patch.SectionLayer.vacuumTerrainMaterial.mainTextureOffset = new Vector2(0.3f, 0.3f);
@@ -55,10 +58,10 @@ public static class Assets {
         // populate cache
         foreach (var (_, materialDef) in Defs.Materials) {
             Shader shaderInstance = GetShader(materialDef.shaderName);
-            Material material = new Material(shaderInstance);
-
-            material.renderQueue = materialDef.renderQueue;
-            material.color = materialDef.color;
+            Material material = new Material(shaderInstance) {
+                renderQueue = materialDef.renderQueue,
+                color = materialDef.color
+            };
 
             if (materialDef.texturePath != null) material.mainTexture = GetTexture(materialDef.texturePath);
 

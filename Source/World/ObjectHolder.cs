@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine;
 namespace Universum.World;
 
 [Verse.StaticConstructorOnStartup]
+[SuppressMessage("Design", "CA1051:Do not declare visible instance fields")]
 public class ObjectHolder : RimWorld.Planet.MapParent {
     public CelestialObject celestialObject;
     public Defs.CelestialObject celestialObjectDef;

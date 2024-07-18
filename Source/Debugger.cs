@@ -31,6 +31,7 @@ public static class Debugger {
         Log(message, severity);
     }
 
+    // ReSharper disable once MemberCanBePrivate.Global
     public static void Log(string message, Severity severity = Severity.Info) {
         bool noMessage = message == null;
         if (noMessage) return;

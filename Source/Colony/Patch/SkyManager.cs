@@ -49,7 +49,7 @@ public static class SkyManager {
                 __instance.SetSunShadowVector(overridenShadowVector.Value);
             } else {
                 __instance.SetSunShadowVector(DEFAULT_SHADOW_VECTOR);
-                color = Color.black;
+                color = Color.white;
             }
             
             Verse.MatBases.SunShadow.color = color;

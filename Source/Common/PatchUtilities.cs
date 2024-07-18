@@ -8,7 +8,7 @@ public static class PatchUtilities {
             
         Debugger.Log(
             key: "Universum.Error.FailedToPatch",
-            prefix: $"{Mod.Manager.METADATA.NAME}: ",
+            prefix: $"{Mod.Manager.METADATA.Name}: ",
             args: [methodName],
             severity: Debugger.Severity.Error
         );

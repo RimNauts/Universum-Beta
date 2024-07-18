@@ -22,7 +22,7 @@ public static class BiomeDef {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static void Prefix(ref RimWorld.BiomeDef __instance) {
-            if (Loader.Defs.BiomeProperties[__instance.index].activeUtilities[Cache.Utilities.Manager.OCEAN_MASKING.id]) {
+            if (Cache.Utilities.Manager.OCEAN_MASKING.CheckBiome(__instance.index)) {
                 __instance = RimWorld.BiomeDefOf.Ocean;
             }
         }
