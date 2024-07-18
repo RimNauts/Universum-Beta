@@ -9,8 +9,9 @@ public class Settings : Verse.ModSettings {
     private static string _inputBuffer;
     
     public static void Init() {
-        Cache.Settings.ConvertUtilitiesFromExposable(null);
-        Cache.Settings.ConvertCelestialBodiesCountFromExposable(null);
+        /*Cache.Settings.ConvertUtilitiesFromExposable(null);
+        Cache.Settings.ConvertCelestialBodiesCountFromExposable(null);*/
+        Manager.METADATA.modSettings = Manager.METADATA.GetSettings<Settings>();
         
         Debugger.Log(
             key: "Universum.Info.settings_loader_done",

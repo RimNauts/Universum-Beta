@@ -1,21 +1,25 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.World.Patch;
 
-public class WorldObjectsHolder {
+public static class WorldObjectsHolder {
+    private const string TYPE_NAME = "RimWorld.Planet.WorldObjectsHolder";
+    
     [HarmonyPatch]
-    static class AddToCache {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class AddToCache {
+        private const string METHOD_NAME = $"{TYPE_NAME}:AddToCache";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldObjectsHolder:AddToCache");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static void Prefix(RimWorld.Planet.WorldObject o) {
             if (o is ObjectHolder objectHolder) Cache.ObjectHolder.Add(objectHolder);
@@ -23,10 +27,13 @@ public class WorldObjectsHolder {
     }
 
     [HarmonyPatch]
-    static class RemoveFromCache {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class RemoveFromCache {
+        private const string METHOD_NAME = $"{TYPE_NAME}:RemoveFromCache";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldObjectsHolder:RemoveFromCache");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static void Prefix(RimWorld.Planet.WorldObject o) {
             if (o is ObjectHolder objectHolder) Cache.ObjectHolder.Remove(objectHolder);
@@ -34,10 +41,13 @@ public class WorldObjectsHolder {
     }
 
     [HarmonyPatch]
-    static class Recache {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class Recache {
+        private const string METHOD_NAME = $"{TYPE_NAME}:Recache";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldObjectsHolder:Recache");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static void Prefix() {
             Cache.ObjectHolder.Clear();

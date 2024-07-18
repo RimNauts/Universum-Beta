@@ -1,13 +1,12 @@
 ﻿using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.World.Patch;
 
@@ -22,20 +21,11 @@ public static class WorldCameraDriver {
     private const float DRAG_VELOCITY_MULTIPLIER = 0.5f;
     
     [HarmonyPatch]
-    static class JumpTo {
+    private static class JumpTo {
         private const string METHOD_NAME = $"{TYPE_NAME}:JumpTo";
+        private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME, [typeof(int)]);
 
@@ -50,20 +40,11 @@ public static class WorldCameraDriver {
     }
 
     [HarmonyPatch]
-    static class AltitudePercent {
+    private static class AltitudePercent {
         private const string METHOD_NAME = $"{TYPE_NAME}:get_AltitudePercent";
+        private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -74,20 +55,11 @@ public static class WorldCameraDriver {
     }
 
     [HarmonyPatch]
-    static class MinAltitude {
+    private static class MinAltitude {
         private const string METHOD_NAME = $"{TYPE_NAME}:get_MinAltitude";
+        private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -98,20 +70,11 @@ public static class WorldCameraDriver {
     }
 
     [HarmonyPatch]
-    static class CurrentZoom {
+    private static class CurrentZoom {
         private const string METHOD_NAME = $"{TYPE_NAME}:get_CurrentZoom";
+        private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -136,20 +99,11 @@ public static class WorldCameraDriver {
     }
 
     [HarmonyPatch]
-    static class WorldCameraDriverOnGUI {
+    private static class WorldCameraDriverOnGUI {
         private const string METHOD_NAME = $"{TYPE_NAME}:WorldCameraDriverOnGUI";
+        private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -270,20 +224,11 @@ public static class WorldCameraDriver {
     }
 
     [HarmonyPatch]
-    static class Update {
+    private static class Update {
         private const string METHOD_NAME = $"{TYPE_NAME}:Update";
+        private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 

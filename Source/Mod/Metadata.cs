@@ -17,18 +17,9 @@ public class Metadata : Verse.Mod {
         ID = content.ModMetaData.PackageId;
         NAME = content.ModMetaData.Name;
         VERSION = content.ModMetaData.ModVersion;
-
-        modSettings = new Settings();
-        modSettings.Mod = this;
     }
 
-    public override void DoSettingsWindowContents(Rect inRect) {
-        Settings.Window(inRect);
-    }
+    public override void DoSettingsWindowContents(Rect inRect) => Settings.Window(inRect);
 
-    public override string SettingsCategory() {
-        return $"{NAME} (v{VERSION})";
-    }
-
-    public override void WriteSettings() { }
+    public override string SettingsCategory() => $"{NAME} (v{VERSION})";
 }

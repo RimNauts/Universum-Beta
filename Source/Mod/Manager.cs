@@ -19,7 +19,6 @@ public static class Manager {
         Loader.Assets.Init();
         
         Harmony harmony = new Harmony(METADATA.ID);
-        harmony.PatchAll(Assembly.GetExecutingAssembly());
         
         Cache.Utilities.OceanMasking.Init(harmony);
         Cache.Utilities.RemoveShadows.Init(harmony);
@@ -30,5 +29,13 @@ public static class Manager {
         Cache.Utilities.WeatherChanger.Init(harmony);
         
         Settings.Init();
+        
+        harmony.PatchAll(Assembly.GetExecutingAssembly());
+        Cache.Utilities.OceanMasking.tracker.ResetPatching();
+        Cache.Utilities.RemoveShadows.tracker.ResetPatching();
+        Cache.Utilities.Temperature.tracker.ResetPatching();
+        Cache.Utilities.Vacuum.tracker.ResetPatching();
+        Cache.Utilities.VacuumOverlay.tracker.ResetPatching();
+        Cache.Utilities.WeatherChanger.tracker.ResetPatching();
     }
 }

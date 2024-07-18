@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
@@ -19,39 +16,27 @@ public static class Section {
     private static readonly Type SUN_SHADOWS_TYPE = typeof(Verse.SectionLayer_SunShadows);
     private static readonly Type TERRAIN_TYPE = typeof(Verse.SectionLayer_Terrain);
     
-    public static class FinalizeMesh {
-        private const string METHOD_NAME = $"{TYPE_NAME}:..ctor";
+    [HarmonyPatch]
+    public static class Constructor {
+        private const string METHOD_NAME = $"{TYPE_NAME}::.ctor";
         private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
-            if (!_verboseError) return false;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            _verboseError = false;
-
-            return false;
+        private static ConstructorInfo TargetMethod() {
+            return AccessTools.Constructor(typeof(Verse.Section), [typeof(Verse.IntVec3), typeof(Verse.Map)]);
         }
 
-        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
-
-
-        public static void Postfix(Verse.Map map, Verse.Section __instance, List<Verse.SectionLayer> ___layers) {
+        public static void Postfix(Verse.IntVec3 sectCoords, Verse.Map map, ref Verse.Section __instance) {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
             if (!Cache.Utilities.Vacuum.maps[mapIndex]) return;
             
             if (Cache.Utilities.RemoveShadows.tracker.active && Cache.Utilities.RemoveShadows.maps[mapIndex]) {
-                ___layers.RemoveAll(layer => SUN_SHADOWS_TYPE.IsInstanceOfType(layer));
+                __instance.layers.RemoveAll(layer => SUN_SHADOWS_TYPE.IsInstanceOfType(layer));
             }
             
-            var terrain = ___layers.Find(layer => TERRAIN_TYPE.IsInstanceOfType(layer));
+            var terrain = __instance.layers.Find(layer => TERRAIN_TYPE.IsInstanceOfType(layer));
             Game.Patch.Game.UpdatePlay.AddSection(map, __instance, terrain);
         }
     }

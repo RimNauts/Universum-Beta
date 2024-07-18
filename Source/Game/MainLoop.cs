@@ -257,7 +257,6 @@ public class MainLoop : Verse.GameComponent {
             _camera.farClipPlane = 500.0f + World.Patch.WorldCameraDriver.MAX_ALTITUDE;
             _camera.fieldOfView = World.Patch.WorldCameraDriver.FIELD_OF_VIEW;
             RimWorld.Planet.WorldCameraManager.worldSkyboxCameraInt.farClipPlane = 500.0f + World.Patch.WorldCameraDriver.MAX_ALTITUDE;
-            Debugger.Log(message:"NEW CAM PROPS");
         }
 
         for (int i = 0; i < _celestialObjects.Count; i++) {

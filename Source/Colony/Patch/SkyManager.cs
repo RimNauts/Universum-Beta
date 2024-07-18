@@ -1,27 +1,28 @@
 ﻿using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class SkyManager {
+    private const string TYPE_NAME = "Verse.SkyManager";
     private static readonly Vector2 DEFAULT_SHADOW_VECTOR = new(0f, 1f);
     private static readonly Color32 FOG_OF_WAR_BASE_COLOR = new(77, 69, 66, byte.MaxValue);
 
+    [HarmonyPatch]
     public static class SkyManagerUpdate {
-        
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:SkyManagerUpdate";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.SkyManager:SkyManagerUpdate");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
 
         public static bool Prefix(ref Verse.SkyManager __instance) {

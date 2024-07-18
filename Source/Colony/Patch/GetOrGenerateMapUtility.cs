@@ -1,38 +1,31 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class GetOrGenerateMapUtility {
+    private const string TYPE_NAME = "Verse.GetOrGenerateMapUtility";
+    
     [HarmonyPatch]
-    static class GetOrGenerateMap {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class GetOrGenerateMap {
+        private const string METHOD_NAME = $"{TYPE_NAME}:GetOrGenerateMap";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() {
-            var type = AccessTools.TypeByName("Verse.GetOrGenerateMapUtility");
-            if (type == null) return null;
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
-            var method = AccessTools.Method(
-                type,
-                "GetOrGenerateMap",
-                [typeof(int), typeof(Verse.IntVec3), typeof(RimWorld.WorldObjectDef)]
-            );
-            
-            return method == null ? null : method;
-        }
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME, [typeof(int), typeof(Verse.IntVec3), typeof(RimWorld.WorldObjectDef)]);
 
         public static void Postfix(int tile, Verse.IntVec3 size, RimWorld.WorldObjectDef suggestedMapParentDef, ref Verse.Map __result) {
-            if (__result == null) return;
+            if (__result is null) return;
 
             World.ObjectHolder objectHolder = Cache.ObjectHolder.Get(tile);
-            if (objectHolder == null || objectHolder.Faction != null) return;
+            if (objectHolder is null || objectHolder.Faction is not null) return;
 
             objectHolder.SetFaction(RimWorld.Faction.OfPlayer);
         }

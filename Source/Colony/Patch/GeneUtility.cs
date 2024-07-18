@@ -1,22 +1,25 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class GeneUtility {
+    private const string TYPE_NAME = "RimWorld.GeneUtility";
+    
     [HarmonyPatch]
-    static class ReimplantXenogerm {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class ReimplantXenogerm {
+        private const string METHOD_NAME = $"{TYPE_NAME}:ReimplantXenogerm";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.GeneUtility:ReimplantXenogerm");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn caster, Verse.Pawn recipient) {
             Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(caster.thingIDNumber);
@@ -24,10 +27,13 @@ public static class GeneUtility {
     }
     
     [HarmonyPatch]
-    static class ExtractXenogerm {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class ExtractXenogerm {
+        private const string METHOD_NAME = $"{TYPE_NAME}:ExtractXenogerm";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.GeneUtility:ExtractXenogerm");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn pawn, int overrideDurationTicks) {
             Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
@@ -35,10 +41,13 @@ public static class GeneUtility {
     }
     
     [HarmonyPatch]
-    static class ImplantXenogermItem {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class ImplantXenogermItem {
+        private const string METHOD_NAME = $"{TYPE_NAME}:ImplantXenogermItem";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.GeneUtility:ImplantXenogermItem");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn pawn, RimWorld.Xenogerm xenogerm) {
             Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
@@ -46,10 +55,13 @@ public static class GeneUtility {
     }
     
     [HarmonyPatch]
-    static class UpdateXenogermReplication {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class UpdateXenogermReplication {
+        private const string METHOD_NAME = $"{TYPE_NAME}:UpdateXenogermReplication";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.GeneUtility:UpdateXenogermReplication");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn pawn) {
             Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);

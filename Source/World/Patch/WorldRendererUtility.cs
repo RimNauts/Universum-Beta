@@ -3,22 +3,26 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.World.Patch;
 
 public static class WorldRendererUtility {
+    private const string TYPE_NAME = "RimWorld.Planet.WorldRendererUtility";
+    
     [HarmonyPatch]
-    static class HiddenBehindTerrainNow {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class HiddenBehindTerrainNow {
+        private const string METHOD_NAME = $"{TYPE_NAME}:HiddenBehindTerrainNow";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.Planet.WorldRendererUtility:HiddenBehindTerrainNow");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static bool Prefix(Vector3 pos, ref bool __result) {
             // ignore icons on surface (settlements)
@@ -36,7 +40,7 @@ public static class WorldRendererUtility {
         return distanceWithFocusPoint > cameraDistanceWithFocusPoint || ShouldHide(pos);
     }
 
-    public static bool ShouldHide(Vector3 pos) {
+    private static bool ShouldHide(Vector3 pos) {
         float altitudePercent = Game.MainLoop.instance.altitudePercent;
         float degree = _CalculateDegreeBasedOnAltitude(altitudePercent);
 

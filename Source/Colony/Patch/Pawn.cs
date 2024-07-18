@@ -1,22 +1,25 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class Pawn {
+    private const string TYPE_NAME = "Verse.Pawn";
+    
     [HarmonyPatch]
-    static class Kill {
-        public static bool Prepare() => TargetMethod() != null;
+    private static class Kill {
+        private const string METHOD_NAME = $"{TYPE_NAME}:Kill";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.Pawn:Kill");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn __instance) {
             Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(__instance.thingIDNumber);

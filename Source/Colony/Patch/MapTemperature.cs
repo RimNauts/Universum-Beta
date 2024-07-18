@@ -1,21 +1,25 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class MapTemperature {
+    private const string TYPE_NAME = "Verse.MapTemperature";
+    
+    [HarmonyPatch]
     public static class OutdoorTemp {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:get_OutdoorTemp";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.MapTemperature:get_OutdoorTemp");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
 
         public static bool Prefix(ref float __result, Verse.Map ___map) {
@@ -28,10 +32,14 @@ public static class MapTemperature {
         }
     }
     
+    [HarmonyPatch]
     public static class SeasonalTemp {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:get_SeasonalTemp";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.MapTemperature:get_SeasonalTemp");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
 
         public static bool Prefix(ref float __result, Verse.Map ___map) {

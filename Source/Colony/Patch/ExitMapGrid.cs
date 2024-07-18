@@ -1,21 +1,25 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class ExitMapGrid {
+    private const string TYPE_NAME = "Verse.ExitMapGrid";
+    
+    [HarmonyPatch]
     public static class Color {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:get_Color";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.ExitMapGrid:get_Color");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(ref Verse.ExitMapGrid __instance, ref UnityEngine.Color __result) {
             Verse.Map map = __instance.map;

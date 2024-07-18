@@ -1,21 +1,25 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class GlobalControls {
+    private const string TYPE_NAME = "RimWorld.GlobalControls";
+    
+    [HarmonyPatch]
     public static class TemperatureString {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:TemperatureString";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("RimWorld.GlobalControls:TemperatureString");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(ref string __result) {
             if (__result is null) return;

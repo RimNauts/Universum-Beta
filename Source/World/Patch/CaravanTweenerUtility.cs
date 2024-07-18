@@ -1,13 +1,12 @@
 ﻿using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.World.Patch;
 
@@ -17,18 +16,9 @@ public static class CaravanTweenerUtility {
     [HarmonyPatch]
     static class PatherTweenedPosRoot {
         private const string METHOD_NAME = $"{TYPE_NAME}:PatherTweenedPosRoot";
+        private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 

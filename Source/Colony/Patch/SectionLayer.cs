@@ -1,14 +1,12 @@
 ﻿using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
@@ -19,25 +17,12 @@ public static class SectionLayer {
     public static Material vacuumGlassTerrainMaterial;
     public static Verse.TerrainDef vacuumGlassTerrainDef;
     
+    [HarmonyPatch]
     public static class FinalizeMesh {
         private const string METHOD_NAME = $"{TYPE_NAME}:FinalizeMesh";
         private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-
-            if (!_verboseError) return false;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            _verboseError = false;
-
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 

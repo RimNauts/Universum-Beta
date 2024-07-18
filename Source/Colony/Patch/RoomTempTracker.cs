@@ -1,21 +1,25 @@
 ﻿using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class RoomTempTracker {
+    private const string TYPE_NAME = "Verse.RoomTempTracker";
+    
+    [HarmonyPatch]
     public static class WallEqualizationTempChangePerInterval {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:WallEqualizationTempChangePerInterval";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.RoomTempTracker:WallEqualizationTempChangePerInterval");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
 
         public static void Postfix(Verse.RoomTempTracker __instance, ref float __result) {
@@ -27,10 +31,14 @@ public static class RoomTempTracker {
         }
     }
     
+    [HarmonyPatch]
     public static class ThinRoofEqualizationTempChangePerInterval {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:ThinRoofEqualizationTempChangePerInterval";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.RoomTempTracker:ThinRoofEqualizationTempChangePerInterval");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
 
         public static void Postfix(Verse.RoomTempTracker __instance, ref float __result) {
@@ -42,10 +50,14 @@ public static class RoomTempTracker {
         }
     }
     
+    [HarmonyPatch]
     public static class EqualizeTemperature {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:EqualizeTemperature";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() => AccessTools.Method("Verse.RoomTempTracker:EqualizeTemperature");
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
+
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
 
         public static bool Prefix(ref Verse.RoomTempTracker __instance) {

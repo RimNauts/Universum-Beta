@@ -18,7 +18,7 @@ public static class VacuumOverlay {
             typeof(Colony.Patch.SectionLayer.FinalizeMesh),
             typeof(Colony.Patch.SectionLayerTerrain.Regenerate),
             typeof(Game.Patch.Game.UpdatePlay),
-            typeof(Colony.Patch.Section.FinalizeMesh)
+            typeof(Colony.Patch.Section.Constructor)
         ]);
         tracker.Init();
     }

@@ -1,34 +1,26 @@
 ﻿using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedParameter.Global
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Colony.Patch;
 
 public static class GenCelestial {
+    private const string TYPE_NAME = "RimWorld.GenCelestial";
+    
+    [HarmonyPatch]
     public static class CelestialSunGlow {
-        public static bool Prepare() => TargetMethod() != null;
+        private const string METHOD_NAME = $"{TYPE_NAME}:CelestialSunGlow";
+        private static bool _verboseError = true;
 
-        private static MethodBase TargetMethod() {
-            var type = AccessTools.TypeByName("RimWorld.GenCelestial:CelestialSunGlow");
-            if (type == null) return null;
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
-            var method = AccessTools.Method(
-                type,
-                "CelestialSunGlow",
-                [typeof(int), typeof(int)]
-            );
-            
-            return method == null ? null : method;
-        }
+        private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME, [typeof(int), typeof(int)]);
 
         public static bool Prefix(int tile, int ticksAbs, ref float __result) {
             if (tile == -1) return true;

@@ -1,45 +1,27 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEngine;
-
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedType.Local
-// ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedParameter.Global
 
 namespace Universum.Game.Patch;
 
-[SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible")]
 public static class Game {
     private const string TYPE_NAME = "Verse.Game";
     
     [HarmonyPatch]
-    static class FinalizeInit {
+    private class FinalizeInit {
         private const string METHOD_NAME = $"{TYPE_NAME}:FinalizeInit";
         private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-
-            if (!_verboseError) return false;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            _verboseError = false;
-
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -57,25 +39,11 @@ public static class Game {
     }
     
     [HarmonyPatch]
-    static class AddMap {
+    private static class AddMap {
         private const string METHOD_NAME = $"{TYPE_NAME}:AddMap";
         private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-
-            if (!_verboseError) return false;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            _verboseError = false;
-
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -94,25 +62,11 @@ public static class Game {
     }
 
     [HarmonyPatch]
-    static class DeinitAndRemoveMap {
+    private static class DeinitAndRemoveMap {
         private const string METHOD_NAME = $"{TYPE_NAME}:DeinitAndRemoveMap";
         private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-
-            if (!_verboseError) return false;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            _verboseError = false;
-
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -143,25 +97,11 @@ public static class Game {
     }
 
     [HarmonyPatch]
-    static class LoadGame {
+    private static class LoadGame {
         private const string METHOD_NAME = $"{TYPE_NAME}:LoadGame";
         private static bool _verboseError = true;
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
-
-            if (!_verboseError) return false;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            _verboseError = false;
-
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -181,17 +121,18 @@ public static class Game {
         }
     }
 
+    [HarmonyPatch]
     public static class UpdatePlay {
         public static class MeshRecalculateHelper {
-            public static readonly List<Task> TASKS = new();
-            public static readonly List<Verse.SectionLayer> LAYERS_TO_DRAW = new();
+            public static readonly List<Task> TASKS = [];
+            public static readonly List<Verse.SectionLayer> LAYERS_TO_DRAW = [];
 
             public static void RecalculateLayer(Verse.SectionLayer instance) {
-                var mesh = instance.GetSubMesh(Colony.Patch.SectionLayer.vacuumTerrainMaterial);
-                var mesh_glass = instance.GetSubMesh(Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial);
+                var vacuumTerrainMesh = instance.GetSubMesh(Colony.Patch.SectionLayer.vacuumTerrainMaterial);
+                var vacuumGlassTerrainMesh = instance.GetSubMesh(Colony.Patch.SectionLayer.vacuumGlassTerrainMaterial);
 
-                if (mesh.verts.Count > 0) TASKS.Add(Task.Factory.StartNew(() => RecalculateMesh(mesh)));
-                if (mesh_glass.verts.Count > 0) TASKS.Add(Task.Factory.StartNew(() => RecalculateMesh(mesh_glass)));
+                if (vacuumTerrainMesh.verts.Count > 0) TASKS.Add(Task.Factory.StartNew(() => RecalculateMesh(vacuumTerrainMesh)));
+                if (vacuumGlassTerrainMesh.verts.Count > 0) TASKS.Add(Task.Factory.StartNew(() => RecalculateMesh(vacuumGlassTerrainMesh)));
 
                 LAYERS_TO_DRAW.Add(instance);
             }
@@ -212,12 +153,12 @@ public static class Game {
 
                     int totalVerts = mesh.verts.Count;
                     for (int i = 0; i < totalVerts; i++) {
-                        var xDiff = mesh.verts[i].x - center.x;
-                        var xFromEdge = xDiff + cellsWide / 2.0f;
-                        var zDiff = mesh.verts[i].z - center.z;
-                        var zFromEdge = zDiff + cellsHigh / 2.0f;
+                        var xDiff = mesh.verts[i].x - _center.x;
+                        var xFromEdge = xDiff + _cellsWide / 2.0f;
+                        var zDiff = mesh.verts[i].z - _center.z;
+                        var zFromEdge = zDiff + _cellsHigh / 2.0f;
 
-                        mesh.uvs.Add(new Vector3(xFromEdge / cellsWide, zFromEdge / cellsHigh, 0.0f));
+                        mesh.uvs.Add(new Vector3(xFromEdge / _cellsWide, zFromEdge / _cellsHigh, 0.0f));
                     }
 
                     mesh.FinalizeMesh(Verse.MeshParts.UVs);
@@ -227,28 +168,14 @@ public static class Game {
         
         private const string METHOD_NAME = $"{TYPE_NAME}:UpdatePlay";
         private static bool _verboseError = true;
-        
-        public static Vector3 center;
-        public static float cellsHigh;
-        public static float cellsWide;
-        public static readonly Dictionary<Verse.Map, Dictionary<Verse.Section, Verse.SectionLayer>> MAP_SECTIONS = new();
-        private static Vector3 lastCameraPosition = new(float.MaxValue, float.MaxValue, float.MaxValue);
 
-        public static bool Prepare() {
-            if (TargetMethod() != null) return true;
+        private static Vector3 _center;
+        private static float _cellsHigh;
+        private static float _cellsWide;
+        private static readonly Dictionary<Verse.Map, Dictionary<Verse.Section, Verse.SectionLayer>> MAP_SECTIONS = new();
+        private static Vector3 _lastCameraPosition = new(float.MaxValue, float.MaxValue, float.MaxValue);
 
-            if (!_verboseError) return false;
-            
-            Debugger.Log(
-                key: "Universum.Error.FailedToPatch",
-                prefix: $"{Mod.Manager.METADATA.NAME}: ",
-                args: [METHOD_NAME],
-                severity: Debugger.Severity.Error
-            );
-            _verboseError = false;
-
-            return false;
-        }
+        public static bool Prepare() => Common.PatchUtilities.Prepare(METHOD_NAME, TargetMethod(), ref _verboseError);
 
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
@@ -258,14 +185,14 @@ public static class Game {
             if (mapIndex == -1 || !Cache.Utilities.Vacuum.maps[mapIndex]) return;
             if (!MAP_SECTIONS.TryGetValue(map, out Dictionary<Verse.Section, Verse.SectionLayer> sections)) return;
             
-            center = MainLoop.colonyCamera.transform.position;
+            _center = MainLoop.colonyCamera.transform.position;
             float ratio = (float) Verse.UI.screenWidth / Verse.UI.screenHeight;
-            cellsHigh = Verse.UI.screenHeight / MainLoop.colonyCameraDriver.CellSizePixels;
-            cellsWide = cellsHigh * ratio;
+            _cellsHigh = Verse.UI.screenHeight / MainLoop.colonyCameraDriver.CellSizePixels;
+            _cellsWide = _cellsHigh * ratio;
 
-            if ((lastCameraPosition - center).magnitude < 1e-4) return;
+            if ((_lastCameraPosition - _center).magnitude < 1e-4) return;
 
-            lastCameraPosition = center;
+            _lastCameraPosition = _center;
             Verse.CellRect visibleRect = MainLoop.colonyCameraDriver.CurrentViewRect;
             foreach (var entry in sections.Where(entry => visibleRect.Overlaps(entry.Key.CellRect))) {
                 MeshRecalculateHelper.RecalculateLayer(entry.Value);

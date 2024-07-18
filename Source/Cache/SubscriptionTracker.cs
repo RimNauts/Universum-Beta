@@ -80,4 +80,11 @@ public class SubscriptionTracker(Harmony harmony, bool alwaysActive = false) {
         
         Verse.Log.Message("Deactivated: Harmony patches are now inactive.");
     }
+
+    public void ResetPatching() {
+        for (int i = 0; i < _numPatches; i++) _patches[i].Unpatch();
+
+        if (!active) return;
+        for (int i = 0; i < _numPatches; i++) _patches[i].Patch();
+    }
 }
