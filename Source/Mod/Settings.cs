@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Universum.Mod;
 
 public class Settings : Verse.ModSettings {
-    private static Vector2 _scrollPos = Vector2.zero;
-    private static string _inputBuffer;
+    private static Vector2 _scrollPosUtilities = Vector2.zero;
+    private static Vector2 _scrollPosObjectGeneration = Vector2.zero;
     
     public static void Init() {
         Manager.METADATA.modSettings = Manager.METADATA.GetSettings<Settings>();
@@ -19,111 +19,124 @@ public class Settings : Verse.ModSettings {
     }
     
     public static void Window(Rect inRect) {
-        // default button
+        DrawDefaultButton(inRect);
+        DrawUtilitiesTable(inRect);
+        DrawObjectGenerationTable(inRect);
+    }
+
+    private static void DrawDefaultButton(Rect inRect) {
         Rect buttonsRectangle = new Rect(inRect.x, inRect.y + 24f, inRect.width, inRect.height - 24f);
         Verse.Listing_Standard buttonsView = new Verse.Listing_Standard();
         buttonsView.Begin(buttonsRectangle);
+
         if (buttonsView.ButtonText(Verse.TranslatorFormattedStringExtensions.Translate("Universum.default"))) {
-            Cache.Settings.ConvertUtilitiesFromExposable(exposableUtilityToggles: null);
-            Cache.Settings.ConvertCelestialBodiesCountFromExposable(exposableCelestialBodiesCount: null);
+            Cache.Settings.ConvertUtilitiesFromExposable(null);
+            Cache.Settings.ConvertCelestialBodiesCountFromExposable(null);
         }
+
         if (Verse.Current.Game != null && Game.MainLoop.instance != null && buttonsView.ButtonText(
-            Verse.TranslatorFormattedStringExtensions.Translate("Universum.Info.regenerate")
-        )) {
+            Verse.TranslatorFormattedStringExtensions.Translate("Universum.Info.regenerate"))) {
             World.Initialization.Regenerate();
             Colony.Patch.MapDrawer.rendered = false;
         }
         buttonsView.End();
-        
-        // table header
-        Rect tableHeaderRectangle = new Rect(buttonsRectangle.x, buttonsRectangle.y + 34f * 3, buttonsRectangle.width, 30f);
-        Verse.Listing_Standard tableHeaderView = new Verse.Listing_Standard();
-        Verse.Widgets.DrawHighlight(tableHeaderRectangle);
-        tableHeaderView.Begin(tableHeaderRectangle);
-        tableHeaderView.Gap(5f);
-        tableHeaderView.ColumnWidth = 460f;
-        tableHeaderView.Label(Verse.TranslatorFormattedStringExtensions.Translate("Universum.utilities"));
-        tableHeaderView.NewColumn();
-        tableHeaderView.Gap(5f);
-        tableHeaderView.ColumnWidth = 100f;
-        tableHeaderView.Label(Verse.TranslatorFormattedStringExtensions.Translate("Universum.enabled"));
-        tableHeaderView.End();
-        
-        // table content
-        Rect tableContentRectangle = new Rect(tableHeaderRectangle.x, tableHeaderRectangle.y - 34f * 4, tableHeaderRectangle.width, Loader.Defs.TotalUtilities * 38f);
-        Rect viewRect = new Rect(0.0f, 0.0f, 100f, Loader.Defs.TotalUtilities * 30f);
-        Verse.Widgets.BeginScrollView(new Rect(tableContentRectangle.x, tableContentRectangle.y + 34f * 5, tableContentRectangle.width, 150f), ref _scrollPos, viewRect);
-        Verse.Listing_Standard tableHeaderContent = new Verse.Listing_Standard();
-        tableHeaderContent.Begin(tableContentRectangle);
-        tableHeaderContent.verticalSpacing = 8f;
-        tableHeaderContent.ColumnWidth = 500f;
-        tableHeaderContent.Gap(4f);
+    }
+
+    private static void DrawUtilitiesTable(Rect inRect) {
+        Rect tableHeaderRectangle = new Rect(inRect.x, inRect.y + 102f, inRect.width, 30f);
+        DrawTableHeader(tableHeaderRectangle, "Universum.utilities", "Universum.enabled");
+
+        Rect scrollViewRect = new Rect(tableHeaderRectangle.x, tableHeaderRectangle.y + 30f, tableHeaderRectangle.width, 200f);
+        Rect contentRect = new Rect(0.0f, 0.0f, scrollViewRect.width - 20f, Loader.Defs.TotalUtilities * 30f);
+        DrawUtilitiesContent(scrollViewRect, contentRect);
+    }
+
+    private static void DrawObjectGenerationTable(Rect inRect) {
+        Rect tableHeaderRectangle = new Rect(inRect.x, inRect.y + 342f, inRect.width, 30f);
+        DrawTableHeader(tableHeaderRectangle, "Universum.Info.SettingsGeneratorHeader", "Universum.Info.Total");
+
+        Rect scrollViewRect = new Rect(tableHeaderRectangle.x, tableHeaderRectangle.y + 30f, tableHeaderRectangle.width, 200f);
+        Rect contentRect = new Rect(0.0f, 0.0f, scrollViewRect.width - 20f, Loader.Defs.CelestialObjectGenerationSteps.Count * 45f);
+        DrawObjectGenerationContent(scrollViewRect, contentRect);
+    }
+
+    private static void DrawTableHeader(Rect headerRect, string leftColumnKey, string rightColumnKey) {
+        Verse.Listing_Standard headerView = new Verse.Listing_Standard();
+        Verse.Widgets.DrawHighlight(headerRect);
+        headerView.Begin(headerRect);
+        headerView.Gap(5f);
+        headerView.ColumnWidth = 460f;
+        headerView.Label(Verse.TranslatorFormattedStringExtensions.Translate(leftColumnKey));
+        headerView.NewColumn();
+        headerView.Gap(5f);
+        headerView.ColumnWidth = 100f;
+        headerView.Label(Verse.TranslatorFormattedStringExtensions.Translate(rightColumnKey));
+        headerView.End();
+    }
+
+    private static void DrawUtilitiesContent(Rect scrollViewRect, Rect contentRect) {
+        Verse.Widgets.BeginScrollView(scrollViewRect, ref _scrollPosUtilities, contentRect);
+        Verse.Listing_Standard contentList = new Verse.Listing_Standard();
+        contentList.Begin(contentRect);
+
         foreach (Defs.Utility utilityDef in Loader.Defs.Utilities.Values) {
             if (utilityDef.hideInSettings) continue;
-
             int utilityId = Loader.Defs.UtilityId[utilityDef.id];
-            
-            bool checkOn = Cache.Settings.UtilityEnabled(utilityId);
-            string modName = "Unknown source";
-            if (!string.IsNullOrEmpty(utilityDef.modName)) modName = utilityDef.modName;
-            string utilityName = utilityDef.id;
-            if (!string.IsNullOrEmpty(utilityDef.labelKey)) {
-                try {
-                    utilityName = Verse.TranslatorFormattedStringExtensions.Translate(utilityDef.labelKey);
-                } catch {
-                    // ignored
-                }
-            }
-            string label = $"({modName}) {utilityName}";
-            string utilityDescription = null;
-            if (!string.IsNullOrEmpty(utilityDef.descriptionKey)) {
-                try {
-                    utilityDescription = Verse.TranslatorFormattedStringExtensions.Translate(utilityDef.descriptionKey);
-                } catch {
-                    // ignored
-                }
-            }
-            tableHeaderContent.CheckboxLabeled(label, ref checkOn, tooltip: utilityDescription);
-            if (Cache.Settings.UtilityEnabled(utilityId) != checkOn) {
-                Cache.Settings.SetUtility(utilityId, checkOn);
-            }
-        }
-        tableHeaderContent.End();
-        Verse.Widgets.EndScrollView();
-        
-        // table header
-        Rect tableHeaderRectangleNew = new Rect(tableContentRectangle.x, tableContentRectangle.y + 34f * 10, tableContentRectangle.width, 30f);
-        Verse.Listing_Standard tableHeaderViewNew = new Verse.Listing_Standard();
-        Verse.Widgets.DrawHighlight(tableHeaderRectangleNew);
-        tableHeaderViewNew.Begin(tableHeaderRectangleNew);
-        tableHeaderViewNew.Gap(5f);
-        tableHeaderViewNew.ColumnWidth = 460f;
-        tableHeaderViewNew.Label("Generator step def name");
-        tableHeaderViewNew.NewColumn();
-        tableHeaderViewNew.Gap(5f);
-        tableHeaderViewNew.ColumnWidth = 100f;
-        tableHeaderViewNew.Label("Total");
-        tableHeaderViewNew.End();
+            bool isEnabled = Cache.Settings.UtilityEnabled(utilityId);
+            string label = FormatUtilityLabel(utilityDef, out string tooltip);
 
-        // table content
-        Rect tableContentRectangleNew = new Rect(tableHeaderRectangleNew.x, tableHeaderRectangleNew.y + 34f * 2, tableHeaderRectangleNew.width, Loader.Defs.TotalUtilities * 38f);
-        Verse.Listing_Standard tableHeaderContentNew = new Verse.Listing_Standard();
-        tableHeaderContentNew.Begin(tableContentRectangleNew);
-        foreach (Defs.ObjectGeneration objectGenerationDef in Loader.Defs.CelestialObjectGenerationSteps.Values) {
-            int buffer = Cache.Settings.CelestialBodiesCount(objectGenerationDef.defName);
-            Verse.Listing_Standard rowView = tableHeaderContentNew.BeginSection(30f);
-            rowView.Gap(5f);
-            rowView.ColumnWidth = 460f;
-            rowView.Label(objectGenerationDef.defName);
-            rowView.NewColumn();
-            rowView.Gap(5f);
-            rowView.ColumnWidth = 350f;
-            _inputBuffer = buffer.ToString();
-            rowView.IntEntry(ref buffer, ref _inputBuffer);
-            Cache.Settings.SetCelestialBodiesCount(objectGenerationDef.defName, buffer);
-            tableHeaderContentNew.EndSection(rowView);
+            contentList.CheckboxLabeled(label, ref isEnabled, tooltip);
+            if (Cache.Settings.UtilityEnabled(utilityId) != isEnabled) {
+                Cache.Settings.SetUtility(utilityId, isEnabled);
+            }
+            
+            contentList.GapLine(5f);
         }
-        tableHeaderContentNew.End();
+        contentList.End();
+        Verse.Widgets.EndScrollView();
+    }
+    
+    private static void DrawObjectGenerationContent(Rect scrollViewRect, Rect contentRect) {
+        Verse.Widgets.BeginScrollView(scrollViewRect, ref _scrollPosObjectGeneration, contentRect);
+        Verse.Listing_Standard contentList = new Verse.Listing_Standard();
+        contentList.Begin(contentRect);
+
+        foreach (Defs.ObjectGeneration objectGenerationDef in Loader.Defs.CelestialObjectGenerationSteps.Values) {
+            Verse.Listing_Standard section = contentList.BeginSection(30f);
+            section.ColumnWidth = 460f;
+            section.Label(objectGenerationDef.defName);
+            section.NewColumn();
+            section.ColumnWidth = 350f;
+
+            int count = Cache.Settings.CelestialBodiesCount(objectGenerationDef.defName);
+            string buffer = count.ToString();
+            section.IntEntry(ref count, ref buffer);
+
+            if (count != Cache.Settings.CelestialBodiesCount(objectGenerationDef.defName)) {
+                Cache.Settings.SetCelestialBodiesCount(objectGenerationDef.defName, count);
+            }
+
+            contentList.EndSection(section);
+            contentList.GapLine(5f);
+        }
+
+        contentList.End();
+        Verse.Widgets.EndScrollView();
+    }
+
+    private static string FormatUtilityLabel(Defs.Utility utilityDef, out string tooltip) {
+        string modName = string.IsNullOrEmpty(utilityDef.modName) ? "Unknown source" : utilityDef.modName;
+        string utilityName = string.IsNullOrEmpty(utilityDef.labelKey) ? utilityDef.id : TryTranslate(utilityDef.labelKey);
+        tooltip = string.IsNullOrEmpty(utilityDef.descriptionKey) ? null : TryTranslate(utilityDef.descriptionKey);
+        return $"({modName}) {utilityName}";
+    }
+
+    private static string TryTranslate(string key) {
+        try {
+            return Verse.TranslatorFormattedStringExtensions.Translate(key);
+        } catch {
+            return key;
+        }
     }
 
     public override void ExposeData() {

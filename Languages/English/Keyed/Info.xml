@@ -9,4 +9,6 @@
     <Universum.Info.settings_loader_done>{0} utilities found</Universum.Info.settings_loader_done>
     <Universum.Info.camera_patch_applied>Applied patch to Camera+</Universum.Info.camera_patch_applied>
     <Universum.Info.regenerate>Regenerate celestial objects</Universum.Info.regenerate>
+    <Universum.Info.Total>Total</Universum.Info.Total>
+    <Universum.Info.SettingsGeneratorHeader>Generator step def name</Universum.Info.SettingsGeneratorHeader>
 </LanguageData>
