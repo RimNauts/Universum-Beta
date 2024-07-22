@@ -3,6 +3,6 @@
 	<WorldGenStepDef>
 		<defName>Universum_Generator</defName>
 		<order>700</order>
-		<worldGenStep Class="Universum.World.Generator"/>
+		<worldGenStep Class="Universum.World.Initialization"/>
 	</WorldGenStepDef>
 </Defs>

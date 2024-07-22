@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+        <Authors>Sindre Eiklid</Authors>
+		<Copyright>Copyright (c) 2024 Sindre Eiklid</Copyright>
+		<OutDir>..\Assemblies\</OutDir>
+        <TargetFramework>net48</TargetFramework>
+        <LangVersion>preview</LangVersion>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Optimize>true</Optimize>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>preview-all</AnalysisLevel>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>portable</DebugType>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>5</WarningLevel>
+		<Title>Universum</Title>
+		<PackageProjectUrl>https://github.com/RimNauts/Universum</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/RimNauts/Universum/blob/main/LICENSE</PackageLicenseUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.5.*" />
+		<PackageReference Include="Lib.Harmony" Version="2.*" ExcludeAssets="runtime" />
+        <PackageReference Include="Krafs.Publicizer" Version="2.2.1">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<Publicize Include="Assembly-CSharp;UnityEngine.CoreModule" />
+	</ItemGroup>
+</Project>
