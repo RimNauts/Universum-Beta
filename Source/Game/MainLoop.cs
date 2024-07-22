@@ -81,7 +81,7 @@ public class MainLoop : Verse.GameComponent {
 
     public void Destroy() {
         _seed = Verse.Rand.Int;
-        _visualGenerationWorker.Join();
+        _visualGenerationWorker?.Join();
         
         if (_celestialObjects == null) return;
         

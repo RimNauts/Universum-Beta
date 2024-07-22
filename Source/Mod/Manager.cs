@@ -19,7 +19,7 @@ public static class Manager {
         
         Cache.Utilities.Manager.Init();
         
-        Cache.Utilities.VacuumDamage.Init();
+        Cache.VacuumDamage.Init();
         
         Settings.Init();
         

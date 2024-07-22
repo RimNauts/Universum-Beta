@@ -6,6 +6,7 @@ using HarmonyLib;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Colony.Patch;
 
@@ -22,10 +23,9 @@ public static class SectionLayerTerrain {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static void Postfix(Verse.SectionLayer __instance) {
-            Verse.Map map = __instance.Map;
-            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
+            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: __instance.Map);
             
-            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM_OVERLAY.maps[mapIndex]) return;
             
             Game.Patch.Game.UpdatePlay.MeshRecalculateHelper.RecalculateLayer(__instance);
         }

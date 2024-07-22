@@ -26,8 +26,10 @@ public static class WorldLayer {
             if (__result == -1) return;
 
             int biomeIndex = Verse.Find.World.grid.tiles.ElementAt(__result).biome.index;
+
+            if (!Cache.Utilities.Manager.OCEAN_MASKING.CheckBiome(biomeIndex)) return;
             
-            if (Cache.Utilities.Manager.OCEAN_MASKING.CheckBiome(biomeIndex)) __result = -1;
+            __result = -1;
         }
     }
 }

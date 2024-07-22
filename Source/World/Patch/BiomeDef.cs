@@ -6,6 +6,7 @@ using HarmonyLib;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.World.Patch;
 
@@ -22,9 +23,9 @@ public static class BiomeDef {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
 
         public static void Prefix(ref RimWorld.BiomeDef __instance) {
-            if (Cache.Utilities.Manager.OCEAN_MASKING.CheckBiome(__instance.index)) {
-                __instance = RimWorld.BiomeDefOf.Ocean;
-            }
+            if (!Cache.Utilities.Manager.OCEAN_MASKING.CheckBiome(__instance.index)) return;
+            
+            __instance = RimWorld.BiomeDefOf.Ocean;
         }
     }
 }

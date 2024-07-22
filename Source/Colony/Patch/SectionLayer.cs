@@ -7,6 +7,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Colony.Patch;
 
@@ -33,7 +34,7 @@ public static class SectionLayer {
             Verse.Map map = ___section.map;
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             
-            if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
+            if (!Cache.Utilities.Manager.VACUUM_OVERLAY.maps[mapIndex]) return;
             
             bool foundSpace = false;
             foreach (Verse.IntVec3 cell in ___section.CellRect.Cells) {
@@ -55,9 +56,9 @@ public static class SectionLayer {
             }
 
             if (foundSpace) return;
-            
-            // is this needed?
-            for (int i = 0; i < __instance.subMeshes.Count; i++) {
+
+            int totalSubMeshes = __instance.subMeshes.Count;
+            for (int i = 0; i < totalSubMeshes; i++) {
                 if (__instance.subMeshes[i].material == vacuumTerrainMaterial ||
                     __instance.subMeshes[i].material == vacuumGlassTerrainMaterial) {
                     __instance.subMeshes.RemoveAt(i);

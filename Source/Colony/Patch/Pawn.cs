@@ -6,6 +6,7 @@ using HarmonyLib;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Colony.Patch;
 
@@ -22,7 +23,7 @@ public static class Pawn {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn __instance) {
-            Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(__instance.thingIDNumber);
+            Cache.VacuumDamage.PAWN_PROTECTION.Remove(__instance.thingIDNumber);
         }
     }
 }

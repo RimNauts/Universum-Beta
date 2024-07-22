@@ -32,9 +32,7 @@ public class CelestialObject : Verse.Def {
     }
     
     public Type celestialObjectClass = typeof(World.CelestialObject);
-
     public string namePackDefName;
-
     public Vector2 scalePercentageBetween = Vector2.one;
     public float? minSize;
     public Vector2 speedPercentageBetween = Vector2.one;
@@ -46,11 +44,8 @@ public class CelestialObject : Verse.Def {
     public Vector2 axialAngleBetween = Vector2.zero;
     public Vector2 spinRotationSpeedBetween = Vector2.zero;
     public Vector2 inclinationAngleBetween = Vector2.zero;
-
     public ObjectHolder objectHolder;
-
     public List<Component> components = [];
-
     public Shape shape;
     public Icon icon;
 }

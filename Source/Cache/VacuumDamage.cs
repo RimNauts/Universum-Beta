@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Universum.Cache.Utilities;
+namespace Universum.Cache;
 
 public static class VacuumDamage {
     public static int decompressionId;

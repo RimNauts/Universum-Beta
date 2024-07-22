@@ -6,6 +6,7 @@ using HarmonyLib;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Colony.Patch;
 
@@ -22,9 +23,7 @@ public static class ExitMapGrid {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(ref Verse.ExitMapGrid __instance, ref UnityEngine.Color __result) {
-            Verse.Map map = __instance.map;
-            
-            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
+            int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: __instance.map);
             if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
             
             __result.a = 0;

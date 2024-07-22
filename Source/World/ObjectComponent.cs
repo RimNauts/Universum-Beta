@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+// ReSharper disable VirtualMemberNeverOverridden.Global
 
 namespace Universum.World;
 

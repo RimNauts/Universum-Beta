@@ -71,7 +71,7 @@ public static class Manager {
                 typeof(Game.Patch.Game.UpdatePlay),
                 typeof(Colony.Patch.Section.Constructor)
             ],
-            alwaysActive: true
+            alwaysActive: false
         );
         
         WEATHER_CHANGER.Init(

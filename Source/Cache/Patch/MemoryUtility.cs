@@ -6,6 +6,7 @@ using HarmonyLib;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Cache.Patch;
 
@@ -30,6 +31,8 @@ public static class MemoryUtility {
             ObjectHolder.Clear();
             
             Utilities.Manager.Reset();
+            
+            VacuumDamage.Reset();
         }
     }
 }

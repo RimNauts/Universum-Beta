@@ -10,6 +10,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Game.Patch;
 
@@ -187,7 +188,7 @@ public static class Game {
         public static void Prefix() {
             Verse.Map map = Verse.Find.CurrentMap;
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
-            if (mapIndex == -1 || !Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
+            if (mapIndex == -1 || !Cache.Utilities.Manager.VACUUM_OVERLAY.maps[mapIndex]) return;
             if (!MAP_SECTIONS.TryGetValue(map, out Dictionary<Verse.Section, Verse.SectionLayer> sections)) return;
             
             _center = MainLoop.colonyCamera.transform.position;

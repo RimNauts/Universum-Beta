@@ -7,6 +7,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Colony.Patch;
 
@@ -36,7 +37,7 @@ public static class SkyManager {
 
             if (map != Verse.Find.CurrentMap) return false;
             
-            Verse.MatBases.LightOverlay.color = curSky.colors.sky;
+            Verse.MatBases.LightOverlay.color = Color.white;
             Verse.Find.CameraColor.saturation = curSky.colors.saturation;
             Color sky = curSky.colors.sky;
             sky.a = 1f;

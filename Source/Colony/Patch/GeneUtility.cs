@@ -6,6 +6,7 @@ using HarmonyLib;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedType.Global
 
 namespace Universum.Colony.Patch;
 
@@ -22,7 +23,7 @@ public static class GeneUtility {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn caster, Verse.Pawn recipient) {
-            Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(caster.thingIDNumber);
+            Cache.VacuumDamage.PAWN_PROTECTION.Remove(caster.thingIDNumber);
         }
     }
     
@@ -36,7 +37,7 @@ public static class GeneUtility {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn pawn, int overrideDurationTicks) {
-            Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
+            Cache.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
         }
     }
     
@@ -50,7 +51,7 @@ public static class GeneUtility {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn pawn, RimWorld.Xenogerm xenogerm) {
-            Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
+            Cache.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
         }
     }
     
@@ -64,7 +65,7 @@ public static class GeneUtility {
         private static MethodBase TargetMethod() => AccessTools.Method(METHOD_NAME);
         
         public static void Postfix(Verse.Pawn pawn) {
-            Cache.Utilities.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
+            Cache.VacuumDamage.PAWN_PROTECTION.Remove(pawn.thingIDNumber);
         }
     }
 }

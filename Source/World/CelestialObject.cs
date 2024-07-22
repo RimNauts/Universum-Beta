@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using Universum.Mod;
+// ReSharper disable VirtualMemberNeverOverridden.Global
 
 namespace Universum.World;
 

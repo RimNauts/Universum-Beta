@@ -14,11 +14,11 @@ public class VacuumWeather(Verse.Map map) : Verse.WeatherEvent(map) {
 
     public override void FireEvent() {
         bool decompressionEnabled =
-            Cache.Settings.UtilityEnabled(Cache.Utilities.VacuumDamage.decompressionId) &&
-            Loader.Defs.BiomeProperties[map.Biome.index].activeUtilities[Cache.Utilities.VacuumDamage.decompressionId];
+            Cache.Settings.UtilityEnabled(Cache.VacuumDamage.decompressionId) &&
+            Loader.Defs.BiomeProperties[map.Biome.index].activeUtilities[Cache.VacuumDamage.decompressionId];
         bool suffocationEnabled =
-            Cache.Settings.UtilityEnabled(Cache.Utilities.VacuumDamage.suffocationId) &&
-            Loader.Defs.BiomeProperties[map.Biome.index].activeUtilities[Cache.Utilities.VacuumDamage.suffocationId];
+            Cache.Settings.UtilityEnabled(Cache.VacuumDamage.suffocationId) &&
+            Loader.Defs.BiomeProperties[map.Biome.index].activeUtilities[Cache.VacuumDamage.suffocationId];
         if (!decompressionEnabled && !suffocationEnabled) return;
         
         IReadOnlyList<Verse.Pawn> pawns = map.mapPawns.AllPawnsSpawned;
@@ -29,7 +29,7 @@ public class VacuumWeather(Verse.Map map) : Verse.WeatherEvent(map) {
             Verse.Room room = Verse.GridsUtility.GetRoom(pawn.Position, map);
             bool vacuum = room == null || room.OpenRoofCount > 0 || room.TouchesMapEdge;
             if (vacuum) {
-                VacuumProtection protection = Cache.Utilities.VacuumDamage.CheckProtection(pawn);
+                VacuumProtection protection = Cache.VacuumDamage.CheckProtection(pawn);
                 switch (protection) {
                     case VacuumProtection.None:
                         if (decompressionEnabled) pawnsToDecompress.Add(pawn);
