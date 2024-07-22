@@ -31,6 +31,7 @@ public class Settings : Verse.ModSettings {
             Verse.TranslatorFormattedStringExtensions.Translate("Universum.Info.regenerate")
         )) {
             World.Initialization.Regenerate();
+            Colony.Patch.MapDrawer.rendered = false;
         }
         buttonsView.End();
         

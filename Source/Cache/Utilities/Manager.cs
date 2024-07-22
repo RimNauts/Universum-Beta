@@ -45,8 +45,7 @@ public static class Manager {
                 typeof(Colony.Patch.MapTemperature.SeasonalTemp),
                 typeof(Colony.Patch.RoomTempTracker.WallEqualizationTempChangePerInterval),
                 typeof(Colony.Patch.RoomTempTracker.ThinRoofEqualizationTempChangePerInterval),
-                typeof(Colony.Patch.RoomTempTracker.EqualizeTemperature),
-                typeof(Colony.Patch.District.OpenRoofCountStopAt)
+                typeof(Colony.Patch.RoomTempTracker.EqualizeTemperature)
             ],
             alwaysActive: false
         );
@@ -57,7 +56,8 @@ public static class Manager {
                 typeof(Colony.Patch.ExitMapGrid.Color),
                 typeof(Colony.Patch.PollutionGrid.SetPolluted),
                 typeof(Colony.Patch.Room.NotifyTerrainChanged),
-                typeof(Colony.Patch.GlobalControls.TemperatureString)
+                typeof(Colony.Patch.GlobalControls.TemperatureString),
+                typeof(Colony.Patch.District.OpenRoofCountStopAt)
             ],
             alwaysActive: false
         );

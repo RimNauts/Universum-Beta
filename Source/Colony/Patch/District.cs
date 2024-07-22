@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 // ReSharper disable UnusedType.Local
 // ReSharper disable UnusedMember.Local
@@ -30,16 +31,15 @@ public static class District {
             int mapIndex = Verse.Current.gameInt.maps.IndexOf(item: map);
             if (!Cache.Utilities.Manager.VACUUM.maps[mapIndex]) return;
 
-            Verse.TerrainDef[] cells = map.terrainGrid.topGrid;
-            int totalCells = cells.Length;
-            for (int i = 0; i < totalCells; i++) {
-                if(cells[i] == null) continue;
-                
-                int terrainIndex = cells[i].index;
+            IEnumerator<Verse.IntVec3> cells = __instance.Cells.GetEnumerator();
+            while (__result < threshold && cells.MoveNext()) {
+                int terrainIndex = map.terrainGrid.TerrainAt(cells.Current).index;
                 if (!Cache.Utilities.Manager.VACUUM.CheckTerrain(terrainIndex)) continue;
                 
                 __result++;
             }
+            
+            cells.Dispose();
         }
     }
 }
